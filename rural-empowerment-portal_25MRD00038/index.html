@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gramin Pragati - Rural Digital Empowerment Portal</title>
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Gramin Pragati is an interactive portal empowering rural India through digital literacy programs, local Wi-Fi / internet access locator services, and easy government e-services access.">
+    <meta name="keywords" content="digital india, rural empowerment, digital literacy, internet access, villages, csc locator, e-krishi, pm kisan">
+    <meta name="author" content="Digital India Empowerment Initiative">
+    <!-- FontAwesome Icons for modern aesthetic -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme">
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="container navbar">
+            <a href="#" class="logo-container">
+                <div class="logo-circle">GP</div>
+                <div class="logo-text" id="brand-logo">Gramin <span>Pragati</span></div>
+            </a>
+            
+            <ul class="nav-menu">
+                <li><a href="#" class="nav-link active" id="nav-home">Home</a></li>
+                <li><a href="#locator" class="nav-link" id="nav-locator">Internet Locator</a></li>
+                <li><a href="#literacy" class="nav-link" id="nav-literacy">Literacy Hub</a></li>
+                <li><a href="#services" class="nav-link" id="nav-services">Services</a></li>
+                <li><a href="#empower" class="nav-link" id="nav-empower">Get Connected</a></li>
+            </ul>
+
+            <div class="controls-container">
+                <!-- Multi-Language Dropdown Selector -->
+                <select id="lang-selector" onchange="renderLanguage(this.value)" class="ctrl-btn lang-dropdown">
+                    <option value="en">English</option>
+                    <option value="hi">हिन्दी (Hindi)</option>
+                    <option value="te">తెలుగు (Telugu)</option>
+                </select>
+                
+                <!-- Quick Contrast Toggle -->
+                <button class="ctrl-btn" id="contrast-quick-toggle" onclick="cycleContrast()" title="Toggle High Contrast">
+                    <i class="fa-solid fa-circle-half-stroke"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero-section" id="home">
+        <div class="container hero-grid">
+            <div class="hero-content">
+                <div class="hero-badge">
+                    <span class="hero-badge-icon"></span>
+                    <span id="hero-badge-text">Digital India Initiative</span>
+                </div>
+                <h1 class="hero-title" id="hero-title">Empowering Rural India through <span>Digital Progress</span></h1>
+                <p class="hero-description" id="hero-desc">
+                    Connecting villages to the world. Gramin Pragati brings high-speed internet kiosk locator tools, self-paced digital literacy modules, and simple access to central government utilities directly to your village.
+                </p>
+                <div class="hero-cta">
+                    <a href="#locator" class="btn btn-primary" id="cta-find">Find Internet Kiosk</a>
+                    <a href="#literacy" class="btn btn-secondary" id="cta-learn">Start Learning</a>
+                </div>
+            </div>
+            
+            <div class="hero-image-wrapper">
+                <img src="rural_hero.jpg" alt="Rural India internet connectivity illustration" class="hero-image">
+                <div class="stats-card">
+                    <div class="stat-item">
+                        <div class="stat-number">250K+</div>
+                        <div class="stat-label" id="stat-panchayats">Panchayats</div>
+                    </div>
+                    <div class="stat-item" style="border-left: 1px solid var(--border-color); border-right: 1px solid var(--border-color); padding: 0 20px;">
+                        <div class="stat-number">12M+</div>
+                        <div class="stat-label" id="stat-literate">Digitally Literate</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">98%</div>
+                        <div class="stat-label" id="stat-connected">Connected</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Internet Access / Kiosk Locator Section -->
+    <section class="section" id="locator">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title" id="locator-title">Internet Access & Kiosk Locator</h2>
+                <p class="section-subtitle" id="locator-subtitle">Find your nearest Common Service Centre (CSC), Wi-Fi Chaupal, or public internet hotspot in seconds.</p>
+            </div>
+            
+            <div class="locator-box">
+                <div class="locator-search-bar">
+                    <div class="search-input-wrapper">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" class="search-input" id="locator-search" placeholder="Enter State, District or Village name..." onkeyup="filterKiosks()">
+                    </div>
+                    <button class="btn btn-primary" onclick="filterKiosks()"><i class="fa-solid fa-location-crosshairs"></i></button>
+                </div>
+                
+                <div class="locator-results" id="locator-results-grid">
+                    <!-- Cards will be dynamically injected by JS -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Digital Literacy Hub & Interactive Quiz -->
+    <section class="section" id="literacy">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title" id="literacy-title">Digital Literacy Learning Hub</h2>
+                <p class="section-subtitle" id="literacy-subtitle">Master digital skills with simple interactive lessons and test your knowledge to earn a digital badge.</p>
+            </div>
+            
+            <div class="literacy-grid">
+                <!-- Learning Modules -->
+                <div class="tutorials-list">
+                    <!-- Card 1 -->
+                    <div class="tut-card" onclick="openModule('internet')">
+                        <div class="tut-icon-box">
+                            <i class="fa-solid fa-globe"></i>
+                        </div>
+                        <h3 class="tut-title" id="tut-title-1">Using the Internet</h3>
+                        <p class="tut-desc" id="tut-desc-1">Learn how to search information, open websites, and stay safe online.</p>
+                        <span class="tut-link" id="tut-link-1">Start Module <i class="fa-solid fa-arrow-right"></i></span>
+                    </div>
+                    <!-- Card 2 -->
+                    <div class="tut-card" onclick="openModule('banking')">
+                        <div class="tut-icon-box">
+                            <i class="fa-solid fa-wallet"></i>
+                        </div>
+                        <h3 class="tut-title" id="tut-title-2">Safe Mobile Banking</h3>
+                        <p class="tut-desc" id="tut-desc-2">Learn UPI payments, secure PIN setup, and how to spot online fraud.</p>
+                        <span class="tut-link" id="tut-link-2">Start Module <i class="fa-solid fa-arrow-right"></i></span>
+                    </div>
+                    <!-- Card 3 -->
+                    <div class="tut-card" onclick="openModule('agriculture')">
+                        <div class="tut-icon-box">
+                            <i class="fa-solid fa-seedling"></i>
+                        </div>
+                        <h3 class="tut-title" id="tut-title-3">Digital Agriculture</h3>
+                        <p class="tut-desc" id="tut-desc-3">Check crop prices, download land records, and view weather advisories online.</p>
+                        <span class="tut-link" id="tut-link-3">Start Module <i class="fa-solid fa-arrow-right"></i></span>
+                    </div>
+                    <!-- Card 4 -->
+                    <div class="tut-card" onclick="openModule('education')">
+                        <div class="tut-icon-box">
+                            <i class="fa-solid fa-graduation-cap"></i>
+                        </div>
+                        <h3 class="tut-title" id="tut-title-4">Online Education</h3>
+                        <p class="tut-desc" id="tut-desc-4">Explore free education portals like DIKSHA & SWAYAM for school children.</p>
+                        <span class="tut-link" id="tut-link-4">Start Module <i class="fa-solid fa-arrow-right"></i></span>
+                    </div>
+                </div>
+                
+                <!-- Interactive Quiz Widget -->
+                <div class="quiz-widget" id="quiz-container">
+                    <div class="quiz-header">
+                        <span class="quiz-title" id="quiz-card-title">Digital Citizen Quiz</span>
+                        <span class="quiz-progress" id="quiz-progress-text">Question 1 of 5</span>
+                    </div>
+                    <div id="quiz-body">
+                        <p class="quiz-question" id="quiz-question-text">Which of the following is safe to share with others online?</p>
+                        <div class="quiz-options" id="quiz-options-container">
+                            <!-- Options injected dynamically -->
+                        </div>
+                        <div class="quiz-footer">
+                            <button class="btn btn-primary" id="quiz-next-btn" onclick="submitAnswer()" disabled>Next Question</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Government Services Quick Dashboard -->
+    <section class="section" id="services">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title" id="services-title">Government e-Services Portal</h2>
+                <p class="section-subtitle" id="services-subtitle">Quick link shortcuts to digital schemes and empowerment portals for villagers.</p>
+            </div>
+            
+            <div class="services-grid">
+                <!-- Service 1 -->
+                <a href="https://pmkisan.gov.in" target="_blank" class="service-card">
+                    <div class="service-icon"><i class="fa-solid fa-wheat-awn"></i></div>
+                    <h3 class="service-title" id="srv-title-1">PM-Kisan Samman Nidhi</h3>
+                    <p class="service-desc" id="srv-desc-1">Check farmer benefit payment status, registration information, and local land records.</p>
+                </a>
+                <!-- Service 2 -->
+                <a href="https://vsws.ap.gov.in" target="_blank" class="service-card">
+                    <div class="service-icon"><i class="fa-solid fa-network-wired"></i></div>
+                    <h3 class="service-title" id="srv-title-2">AP Grama Sachivalayam</h3>
+                    <p class="service-desc" id="srv-desc-2">Access hundreds of state services and welfare schemes directly in your village secretariat.</p>
+                </a>
+                <!-- Service 3 -->
+                <a href="https://apfibernet.ap.gov.in" target="_blank" class="service-card">
+                    <div class="service-icon"><i class="fa-solid fa-tower-broadcast"></i></div>
+                    <h3 class="service-title" id="srv-title-3">AP FiberNet Portal</h3>
+                    <p class="service-desc" id="srv-desc-3">Check village broadband status, connection availability, and digital television plans.</p>
+                </a>
+                <!-- Service 4 -->
+                <a href="https://digilocker.gov.in" target="_blank" class="service-card">
+                    <div class="service-icon"><i class="fa-solid fa-vault"></i></div>
+                    <h3 class="service-title" id="srv-title-4">DigiLocker</h3>
+                    <p class="service-desc" id="srv-desc-4">Access authentic digital documents like Aadhaar, Driving License, and school marksheets.</p>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Support / Request Kiosk Connection -->
+    <section class="section" id="empower">
+        <div class="container form-grid">
+            <div class="info-column">
+                <div class="hero-badge">
+                    <span id="form-badge-text">Get Connected Today</span>
+                </div>
+                <h2 class="section-title" style="text-align: left;" id="form-header">Bring Digital Services to Your Village</h2>
+                <p id="form-subheader">Don't have an active CSC or Wi-Fi hotspot in your Gram Panchayat? Submit a digital request, and our district digital team will review setup possibilities.</p>
+                
+                <div class="info-card">
+                    <div class="info-icon"><i class="fa-solid fa-phone"></i></div>
+                    <div class="info-content">
+                        <h4 id="info-call-title">Call Helpline</h4>
+                        <p>Toll Free: 1800-3000-3468 (24x7 Support)</p>
+                    </div>
+                </div>
+                <div class="info-card">
+                    <div class="info-icon"><i class="fa-solid fa-envelope"></i></div>
+                    <div class="info-content">
+                        <h4 id="info-email-title">Email Support</h4>
+                        <p>support.empower@digitalindia.gov.in</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-box">
+                <h3 class="form-title" id="form-box-title">Request a Village Connection</h3>
+                
+                <form id="connection-form" onsubmit="handleFormSubmit(event)">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="user-name" class="form-label" id="lbl-name">Your Full Name</label>
+                            <input type="text" id="user-name" class="form-input" required placeholder="e.g. Ramesh Kumar">
+                        </div>
+                        <div class="form-group">
+                            <label for="user-phone" class="form-label" id="lbl-phone">Phone Number</label>
+                            <input type="tel" id="user-phone" class="form-input" pattern="[0-9]{10}" required placeholder="10-digit mobile number">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="user-state" class="form-label" id="lbl-state">State</label>
+                            <input type="text" id="user-state" class="form-input" required placeholder="e.g. Uttar Pradesh">
+                        </div>
+                        <div class="form-group">
+                            <label for="user-district" class="form-label" id="lbl-district">District</label>
+                            <input type="text" id="user-district" class="form-input" required placeholder="e.g. Varanasi">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group form-group-full">
+                        <label for="user-village" class="form-label" id="lbl-village">Village / Gram Panchayat Name</label>
+                        <input type="text" id="user-village" class="form-input" required placeholder="e.g. Kadhwan">
+                    </div>
+                    
+                    <div class="form-group form-group-full">
+                        <label for="user-message" class="form-label" id="lbl-msg">Additional Requirements (Optional)</label>
+                        <textarea id="user-message" class="form-input" placeholder="Tell us if your school or clinic needs internet..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%;" id="btn-submit">Submit Request</button>
+                </form>
+                
+                <!-- Success State (hidden initially) -->
+                <div class="success-overlay" id="form-success">
+                    <div class="success-icon"><i class="fa-solid fa-circle-check"></i></div>
+                    <h3 class="success-title" id="succ-title">Request Successfully Logged!</h3>
+                    <p class="success-desc" id="succ-desc">Thank you for contacting us. Your digital request ID is <strong id="ticket-number">#GP-98214</strong>. A representative from the block office will reach out shortly.</p>
+                    <button class="btn btn-secondary" onclick="resetForm()" id="succ-btn-back">Go Back</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Learning Modal Window -->
+    <div class="modal-overlay" id="learning-modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModule()"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-body" id="modal-content-body">
+                <!-- Content Injected Dynamically by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Accessibility Panel Floating Widget -->
+    <div class="acc-panel-float">
+        <button class="acc-panel-btn" onclick="toggleAccMenu()" title="Open Accessibility Panel">
+            <i class="fa-solid fa-universal-access"></i>
+        </button>
+        
+        <div class="acc-menu" id="acc-menu">
+            <div class="acc-title" id="acc-panel-title">Accessibility Panel</div>
+            
+            <div class="acc-option">
+                <span class="acc-label" id="acc-lbl-text">Text Size</span>
+                <div class="btn-group">
+                    <button class="btn ctrl-btn btn-sm" onclick="scaleFont('normal')">A</button>
+                    <button class="btn ctrl-btn btn-sm" onclick="scaleFont('lg')">A+</button>
+                    <button class="btn ctrl-btn btn-sm" onclick="scaleFont('xl')">A++</button>
+                </div>
+            </div>
+            
+            <div class="acc-option">
+                <span class="acc-label" id="acc-lbl-contrast">Contrast Mode</span>
+                <div class="btn-group">
+                    <button class="btn ctrl-btn btn-sm" onclick="setTheme('dark')" id="acc-theme-dark">Dark</button>
+                    <button class="btn ctrl-btn btn-sm" onclick="setTheme('light')" id="acc-theme-light">Light</button>
+                    <button class="btn ctrl-btn btn-sm" onclick="setTheme('high-contrast')" id="acc-theme-hc">Contrast</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container footer-grid">
+            <div class="footer-brand">
+                <a href="#" class="logo-container">
+                    <div class="logo-circle">GP</div>
+                    <div class="logo-text">Gramin <span>Pragati</span></div>
+                </a>
+                <p class="footer-brand-desc" id="foot-desc">Empowering rural communities through digital literacy, connectivity, and open government services.</p>
+            </div>
+            
+            <div class="footer-col">
+                <h5 id="foot-hdr-quick">Quick Navigation</h5>
+                <ul class="footer-links">
+                    <li><a href="#" id="foot-nav-home">Home</a></li>
+                    <li><a href="#locator" id="foot-nav-locator">Internet Locator</a></li>
+                    <li><a href="#literacy" id="foot-nav-literacy">Literacy Hub</a></li>
+                    <li><a href="#services" id="foot-nav-services">e-Services Portal</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h5 id="foot-hdr-gov">Important Portals</h5>
+                <ul class="footer-links">
+                    <li><a href="https://www.digitalindia.gov.in" target="_blank">Digital India</a></li>
+                    <li><a href="https://csc.gov.in" target="_blank">CSC Portal</a></li>
+                    <li><a href="https://pmgdisha.in" target="_blank">PMGDISHA Literacy</a></li>
+                    <li><a href="https://mygov.in" target="_blank">MyGov India</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h5 id="foot-hdr-contact">Contact</h5>
+                <ul class="footer-links">
+                    <li><i class="fa-solid fa-envelope"></i> help@digitalindia.in</li>
+                    <li><i class="fa-solid fa-phone"></i> 1800-111-468</li>
+                    <li><i class="fa-solid fa-location-dot"></i> Ministry of Electronics & IT, New Delhi, India</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="container footer-bottom">
+            <p>&copy; 2026 Gramin Pragati. Managed by Digital India Rural Development Department.</p>
+            <p id="foot-disclaimer">Website is designed for fast rendering over low-bandwidth rural networks.</p>
+        </div>
+    </footer>
+
+    <!-- Custom Logic Script -->
+    <script src="app.js"></script>
+</body>
+</html>

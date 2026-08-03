@@ -1,0 +1,14 @@
+# Ignore Java compiled class files
+*.class
+
+# Ignore temporary files
+*.tmp
+*.log
+
+# Ignore OS-specific files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Ignore VS Code settings if desired, but keep workspace if needed
+#.vscode/

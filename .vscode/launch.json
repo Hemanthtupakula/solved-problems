@@ -1,0 +1,91 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CircularLinkedList",
+            "request": "launch",
+            "mainClass": "CircularLinkedList",
+            "projectName": "anti java_6d9645ef"
+        },
+        {
+            "type": "java",
+            "name": "PolymorphismDemo",
+            "request": "launch",
+            "mainClass": "PolymorphismDemo",
+            "projectName": "anti java_6d9645ef"
+        },
+        {
+            "type": "java",
+            "name": "LargeValueArrValue",
+            "request": "launch",
+            "mainClass": "LargeValueArrValue",
+            "projectName": "anti java_6d9645ef"
+        },
+        {
+            "type": "java",
+            "name": "TwoClassesDemo",
+            "request": "launch",
+            "mainClass": "TwoClassesDemo",
+            "projectName": "anti java_6d9645ef"
+        },
+        {
+            "type": "java",
+            "name": "Rev",
+            "request": "launch",
+            "mainClass": "Rev",
+            "projectName": "anti java_6d9645ef"
+        },
+        {
+            "type": "java",
+            "name": "Palindrome",
+            "request": "launch",
+            "mainClass": "Palindrome",
+            "projectName": "anti java_6d9645ef"
+        },
+        {
+            "type": "java",
+            "name": "PrintAllCharacters",
+            "request": "launch",
+            "mainClass": "PrintAllCharacters",
+            "projectName": "anti java_6d9645ef"
+        },
+        {
+            "type": "java",
+            "name": "MinMaxDataTypes",
+            "request": "launch",
+            "mainClass": "MinMaxDataTypes",
+            "projectName": "anti java_6d9645ef"
+        },
+        {
+            "type": "java",
+            "name": "Dataype",
+            "request": "launch",
+            "mainClass": "Dataype",
+            "projectName": "anti java_6d9645ef"
+        },
+        {
+            "type": "java",
+            "name": "LinkedListSort",
+            "request": "launch",
+            "mainClass": "LinkedListSort",
+            "projectName": "anti java_6d9645ef"
+        },
+        {
+            "type": "java",
+            "name": "NearestSmallerElement",
+            "request": "launch",
+            "mainClass": "NearestSmallerElement",
+            "projectName": "anti java_6d9645ef"
+        },
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        }
+    ]
+}
