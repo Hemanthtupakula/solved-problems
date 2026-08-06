@@ -6,6 +6,7 @@ let selectedRestaurant = null;
 let activeFilter = 'all';
 let appliedDiscount = 0.0;
 let promoCodeApplied = "";
+let isSimulatorMode = false; // flag indicating if we've fallen back to browser simulation
 
 // South Indian Promo Codes
 const PROMO_CODES = {
@@ -46,6 +47,171 @@ const ITEM_META = {
     "Bellam Sunnundalu": { cals: 170, rating: "4.8 ★" },
     "Poornalu / Boorelu": { cals: 190, rating: "4.8 ★" }
 };
+
+// Fallback 150 Andhra items catalog for Static / GitHub Pages deployment
+const FALLBACK_150_ITEMS = [
+    // Tiffins & Breakfast (1-25)
+    { name: "Babai Idli", price: 50.0, category: "Breakfast", type: "Veg", subType: "Pure-Veg" },
+    { name: "Ghee Podi Idli", price: 60.0, category: "Breakfast", type: "Veg", subType: "Pure-Veg" },
+    { name: "Neyyi Karapu Idli", price: 65.0, category: "Breakfast", type: "Veg", subType: "Pure-Veg" },
+    { name: "Sambar Idli", price: 55.0, category: "Breakfast", type: "Veg", subType: "Pure-Veg" },
+    { name: "Button Idli", price: 50.0, category: "Breakfast", type: "Veg", subType: "Pure-Veg" },
+    { name: "Masala Dosa", price: 80.0, category: "Breakfast", type: "Veg", subType: "Pure-Veg" },
+    { name: "Erra Karam Dosa", price: 85.0, category: "Breakfast", type: "Veg", subType: "Pure-Veg" },
+    { name: "Onion Dosa", price: 75.0, category: "Breakfast", type: "Veg", subType: "Pure-Veg" },
+    { name: "Ghee Roast Dosa", price: 90.0, category: "Breakfast", type: "Veg", subType: "Pure-Veg" },
+    { name: "Rava Masala Dosa", price: 90.0, category: "Breakfast", type: "Veg", subType: "Pure-Veg" },
+    { name: "MLA Dosa", price: 110.0, category: "Breakfast", type: "Veg", subType: "Pure-Veg" },
+    { name: "Pesarattu Upma", price: 95.0, category: "Breakfast", type: "Veg", subType: "Vegan" },
+    { name: "Onion Pesarattu", price: 85.0, category: "Breakfast", type: "Veg", subType: "Vegan" },
+    { name: "Dibba Rotti", price: 70.0, category: "Breakfast", type: "Veg", subType: "Vegan" },
+    { name: "Puri Curry", price: 60.0, category: "Breakfast", type: "Veg", subType: "Vegan" },
+    { name: "Pongal", price: 70.0, category: "Breakfast", type: "Veg", subType: "Vegan" },
+    { name: "Uggani Bajji", price: 80.0, category: "Breakfast", type: "Veg", subType: "Vegan" },
+    { name: "Egg Dosa", price: 100.0, category: "Breakfast", type: "Non-Veg", subType: "Egg" },
+    { name: "Chicken Keema Dosa", price: 130.0, category: "Breakfast", type: "Non-Veg", subType: "Chicken" },
+    { name: "Mutton Keema Dosa", price: 150.0, category: "Breakfast", type: "Non-Veg", subType: "Mutton" },
+    { name: "Egg Pesarattu", price: 110.0, category: "Breakfast", type: "Non-Veg", subType: "Egg" },
+    { name: "Chicken Keema Pesarattu", price: 140.0, category: "Breakfast", type: "Non-Veg", subType: "Chicken" },
+    { name: "Minapa Garelu", price: 60.0, category: "Breakfast", type: "Veg", subType: "Pure-Veg" },
+    { name: "Sambar Vada", price: 70.0, category: "Breakfast", type: "Veg", subType: "Pure-Veg" },
+    { name: "Rava Dosa", price: 75.0, category: "Breakfast", type: "Veg", subType: "Pure-Veg" },
+    
+    // Lunch - Vindu Bhojanam (26-55)
+    { name: "Andhra Veg Meals Thali", price: 180.0, category: "Lunch", type: "Veg", subType: "Pure-Veg" },
+    { name: "Gutti Vankaya Koora", price: 130.0, category: "Lunch", type: "Veg", subType: "Pure-Veg" },
+    { name: "Tomato Pappu", price: 90.0, category: "Lunch", type: "Veg", subType: "Pure-Veg" },
+    { name: "Gongura Pappu", price: 95.0, category: "Lunch", type: "Veg", subType: "Pure-Veg" },
+    { name: "Dosakaya Pappu", price: 90.0, category: "Lunch", type: "Veg", subType: "Pure-Veg" },
+    { name: "Menthi Pappu", price: 90.0, category: "Lunch", type: "Veg", subType: "Pure-Veg" },
+    { name: "Kakarakaya Vepudu", price: 100.0, category: "Lunch", type: "Veg", subType: "Vegan" },
+    { name: "Bendakaya Fry", price: 95.0, category: "Lunch", type: "Veg", subType: "Vegan" },
+    { name: "Dondakaya Vepudu", price: 95.0, category: "Lunch", type: "Veg", subType: "Vegan" },
+    { name: "Aratikaaya Vepudu", price: 100.0, category: "Lunch", type: "Veg", subType: "Vegan" },
+    { name: "Chikkudukaya Koora", price: 110.0, category: "Lunch", type: "Veg", subType: "Vegan" },
+    { name: "Beerakaya Eguru", price: 100.0, category: "Lunch", type: "Veg", subType: "Vegan" },
+    { name: "Chamadumpala Pulusu", price: 115.0, category: "Lunch", type: "Veg", subType: "Vegan" },
+    { name: "Tomato Charu Bowl", price: 50.0, category: "Lunch", type: "Veg", subType: "Vegan" },
+    { name: "Miryala Rasam Bowl", price: 50.0, category: "Lunch", type: "Veg", subType: "Vegan" },
+    { name: "Pappu Charu Bowl", price: 60.0, category: "Lunch", type: "Veg", subType: "Vegan" },
+    { name: "Ulavacharu Bowl", price: 80.0, category: "Lunch", type: "Veg", subType: "Vegan" },
+    { name: "Gongura Chicken Curry", price: 180.0, category: "Lunch", type: "Non-Veg", subType: "Chicken" },
+    { name: "Andhra Chicken Fry (Kodi Vepudu)", price: 190.0, category: "Lunch", type: "Non-Veg", subType: "Chicken" },
+    { name: "Rayalaseema Natu Kodi Pulusu", price: 220.0, category: "Lunch", type: "Non-Veg", subType: "Chicken" },
+    { name: "Gongura Mutton Koora", price: 240.0, category: "Lunch", type: "Non-Veg", subType: "Mutton" },
+    { name: "Andhra Mutton Fry", price: 250.0, category: "Lunch", type: "Non-Veg", subType: "Mutton" },
+    { name: "Nellore Chepala Pulusu", price: 210.0, category: "Lunch", type: "Non-Veg", subType: "Fish" },
+    { name: "Royyala Iguru (Prawn)", price: 230.0, category: "Lunch", type: "Non-Veg", subType: "Prawns" },
+    { name: "Peethala Kura (Crab)", price: 240.0, category: "Lunch", type: "Non-Veg", subType: "Crab" },
+    { name: "Bommidala Pulusu (Fish)", price: 250.0, category: "Lunch", type: "Non-Veg", subType: "Fish" },
+    { name: "Egg Pulusu", price: 110.0, category: "Lunch", type: "Non-Veg", subType: "Egg" },
+    { name: "Egg Masala Curry", price: 120.0, category: "Lunch", type: "Non-Veg", subType: "Egg" },
+    { name: "Gobi Manchurian (AP Style)", price: 130.0, category: "Lunch", type: "Veg", subType: "Vegan" },
+    { name: "Chili Paneer (AP Style)", price: 150.0, category: "Lunch", type: "Veg", subType: "Pure-Veg" },
+
+    // Dinner (56-75)
+    { name: "Ragi Sangati", price: 80.0, category: "Dinner", type: "Veg", subType: "Vegan" },
+    { name: "Jonna Rotte", price: 30.0, category: "Dinner", type: "Veg", subType: "Vegan" },
+    { name: "Sajja Rotte", price: 35.0, category: "Dinner", type: "Veg", subType: "Vegan" },
+    { name: "Chapathi", price: 25.0, category: "Dinner", type: "Veg", subType: "Vegan" },
+    { name: "Pulaka", price: 20.0, category: "Dinner", type: "Veg", subType: "Vegan" },
+    { name: "Hyderabadi Veg Biryani", price: 160.0, category: "Dinner", type: "Veg", subType: "Pure-Veg" },
+    { name: "Paneer Biryani", price: 180.0, category: "Dinner", type: "Veg", subType: "Pure-Veg" },
+    { name: "Ulavacharu Veg Biryani", price: 190.0, category: "Dinner", type: "Veg", subType: "Pure-Veg" },
+    { name: "Kaju Biryani", price: 210.0, category: "Dinner", type: "Veg", subType: "Pure-Veg" },
+    { name: "Hyderabadi Chicken Biryani", price: 220.0, category: "Dinner", type: "Non-Veg", subType: "Chicken" },
+    { name: "Gongura Chicken Biryani", price: 230.0, category: "Dinner", type: "Non-Veg", subType: "Chicken" },
+    { name: "Ulavacharu Chicken Biryani", price: 240.0, category: "Dinner", type: "Non-Veg", subType: "Chicken" },
+    { name: "Andhra Chicken Fry Piece Biryani", price: 230.0, category: "Dinner", type: "Non-Veg", subType: "Chicken" },
+    { name: "Hyderabadi Mutton Biryani", price: 280.0, category: "Dinner", type: "Non-Veg", subType: "Mutton" },
+    { name: "Gongura Mutton Biryani", price: 295.0, category: "Dinner", type: "Non-Veg", subType: "Mutton" },
+    { name: "Ulavacharu Mutton Biryani", price: 310.0, category: "Dinner", type: "Non-Veg", subType: "Mutton" },
+    { name: "Andhra Mutton Fry Piece Biryani", price: 295.0, category: "Dinner", type: "Non-Veg", subType: "Mutton" },
+    { name: "Egg Biryani", price: 160.0, category: "Dinner", type: "Non-Veg", subType: "Egg" },
+    { name: "Prawn Biryani", price: 260.0, category: "Dinner", type: "Non-Veg", subType: "Prawns" },
+    { name: "Fish Biryani", price: 250.0, category: "Dinner", type: "Non-Veg", subType: "Fish" },
+
+    // Pachadi (76-100)
+    { name: "Gongura Pachadi", price: 40.0, category: "Pachadi", type: "Veg", subType: "Vegan" },
+    { name: "Tomato Pachadi", price: 35.0, category: "Pachadi", type: "Veg", subType: "Vegan" },
+    { name: "Dondakaya Pachadi", price: 35.0, category: "Pachadi", type: "Veg", subType: "Vegan" },
+    { name: "Kobbari Pachadi", price: 40.0, category: "Pachadi", type: "Veg", subType: "Vegan" },
+    { name: "Allam Pachadi", price: 40.0, category: "Pachadi", type: "Veg", subType: "Vegan" },
+    { name: "Dosakaya Pachadi", price: 35.0, category: "Pachadi", type: "Veg", subType: "Vegan" },
+    { name: "Beerakaya Thokku Pachadi", price: 40.0, category: "Pachadi", type: "Veg", subType: "Vegan" },
+    { name: "Avakaya Uragaya", price: 45.0, category: "Pachadi", type: "Veg", subType: "Vegan" },
+    { name: "Bellam Avakaya", price: 45.0, category: "Pachadi", type: "Veg", subType: "Vegan" },
+    { name: "Maagai Uragaya", price: 45.0, category: "Pachadi", type: "Veg", subType: "Vegan" },
+    { name: "Pandu Mirapakaya Pachadi", price: 40.0, category: "Pachadi", type: "Veg", subType: "Vegan" },
+    { name: "Usirikaya Pachadi", price: 40.0, category: "Pachadi", type: "Veg", subType: "Vegan" },
+    { name: "Chintakaya Pachadi", price: 40.0, category: "Pachadi", type: "Veg", subType: "Vegan" },
+    { name: "Nalla Karam Podi", price: 30.0, category: "Pachadi", type: "Veg", subType: "Vegan" },
+    { name: "Kandi Podi", price: 35.0, category: "Pachadi", type: "Veg", subType: "Vegan" },
+    { name: "Karivepaku Podi", price: 35.0, category: "Pachadi", type: "Veg", subType: "Vegan" },
+    { name: "Kakarakaya Podi", price: 40.0, category: "Pachadi", type: "Veg", subType: "Vegan" },
+    { name: "Putnala Podi", price: 30.0, category: "Pachadi", type: "Veg", subType: "Vegan" },
+    { name: "Ghee Podi Rice Bowl", price: 90.0, category: "Pachadi", type: "Veg", subType: "Pure-Veg" },
+    { name: "Curd Rice (Daddojanam)", price: 80.0, category: "Pachadi", type: "Veg", subType: "Pure-Veg" },
+    { name: "Lemon Rice (Pulihora)", price: 80.0, category: "Pachadi", type: "Veg", subType: "Vegan" },
+    { name: "Tamarind Pulihora", price: 85.0, category: "Pachadi", type: "Veg", subType: "Vegan" },
+    { name: "Gongura Rice", price: 90.0, category: "Pachadi", type: "Veg", subType: "Vegan" },
+    { name: "Mango Pulihora", price: 90.0, category: "Pachadi", type: "Veg", subType: "Vegan" },
+    { name: "Coconut Rice", price: 95.0, category: "Pachadi", type: "Veg", subType: "Vegan" },
+
+    // Snacks (101-125)
+    { name: "Mirchi Bajji", price: 45.0, category: "Snacks", type: "Veg", subType: "Vegan" },
+    { name: "Punugulu", price: 40.0, category: "Snacks", type: "Veg", subType: "Vegan" },
+    { name: "Mysore Bonda", price: 50.0, category: "Snacks", type: "Veg", subType: "Pure-Veg" },
+    { name: "Challa Punugulu", price: 45.0, category: "Snacks", type: "Veg", subType: "Pure-Veg" },
+    { name: "Onion Pakodi", price: 40.0, category: "Snacks", type: "Veg", subType: "Vegan" },
+    { name: "Garijalu", price: 50.0, category: "Snacks", type: "Veg", subType: "Vegan" },
+    { name: "Chegodi", price: 35.0, category: "Snacks", type: "Veg", subType: "Vegan" },
+    { name: "Janthikalu", price: 35.0, category: "Snacks", type: "Veg", subType: "Vegan" },
+    { name: "Murukulu", price: 35.0, category: "Snacks", type: "Veg", subType: "Vegan" },
+    { name: "Sakinalu", price: 40.0, category: "Snacks", type: "Veg", subType: "Vegan" },
+    { name: "Poha Mixture", price: 30.0, category: "Snacks", type: "Veg", subType: "Vegan" },
+    { name: "Masala Vada", price: 45.0, category: "Snacks", type: "Veg", subType: "Vegan" },
+    { name: "Sweet Corn Vadalu", price: 55.0, category: "Snacks", type: "Veg", subType: "Vegan" },
+    { name: "Aloo Samosa", price: 35.0, category: "Snacks", type: "Veg", subType: "Vegan" },
+    { name: "Veg Cutlet", price: 50.0, category: "Snacks", type: "Veg", subType: "Vegan" },
+    { name: "Spring Rolls (AP style)", price: 70.0, category: "Snacks", type: "Veg", subType: "Vegan" },
+    { name: "Onion Bajji", price: 40.0, category: "Snacks", type: "Veg", subType: "Vegan" },
+    { name: "Aloo Bajji", price: 40.0, category: "Snacks", type: "Veg", subType: "Vegan" },
+    { name: "Aratikaaya Bajji", price: 45.0, category: "Snacks", type: "Veg", subType: "Vegan" },
+    { name: "Tomato Bajji", price: 50.0, category: "Snacks", type: "Veg", subType: "Vegan" },
+    { name: "Chicken Pakodi", price: 110.0, category: "Snacks", type: "Non-Veg", subType: "Chicken" },
+    { name: "Egg Bonda", price: 70.0, category: "Snacks", type: "Non-Veg", subType: "Egg" },
+    { name: "Fish Finger (AP style)", price: 140.0, category: "Snacks", type: "Non-Veg", subType: "Fish" },
+    { name: "Chicken Keema Samosa", price: 80.0, category: "Snacks", type: "Non-Veg", subType: "Chicken" },
+    { name: "Prawn Fry (Snack)", price: 160.0, category: "Snacks", type: "Non-Veg", subType: "Prawns" },
+
+    // Drinks & Sweets (126-150)
+    { name: "South Indian Filter Kaapi", price: 40.0, category: "Drinks", type: "Veg", subType: "Dairy-Based" },
+    { name: "Bellam Paanakam", price: 35.0, category: "Drinks", type: "Veg", subType: "Vegan" },
+    { name: "Spiced Majjiga (Buttermilk)", price: 35.0, category: "Drinks", type: "Veg", subType: "Dairy-Based" },
+    { name: "Nannari Sharbat", price: 45.0, category: "Drinks", type: "Veg", subType: "Vegan" },
+    { name: "Sugandhi Soda", price: 40.0, category: "Drinks", type: "Veg", subType: "Vegan" },
+    { name: "Badam Milk (Cold)", price: 60.0, category: "Drinks", type: "Veg", subType: "Dairy-Based" },
+    { name: "Ragi Ambali", price: 45.0, category: "Drinks", type: "Veg", subType: "Vegan" },
+    { name: "Coconut Water", price: 40.0, category: "Drinks", type: "Veg", subType: "Vegan" },
+    { name: "Lemon Soda", price: 35.0, category: "Drinks", type: "Veg", subType: "Vegan" },
+    { name: "Mango Lassi", price: 70.0, category: "Drinks", type: "Veg", subType: "Dairy-Based" },
+    { name: "Rose Milk", price: 55.0, category: "Drinks", type: "Veg", subType: "Dairy-Based" },
+    { name: "Masala Tea", price: 30.0, category: "Drinks", type: "Veg", subType: "Dairy-Based" },
+    { name: "Ginger Tea", price: 30.0, category: "Drinks", type: "Veg", subType: "Dairy-Based" },
+    { name: "Atreyapuram Bellam Pootharekulu", price: 40.0, category: "Sweets", type: "Veg", subType: "Bellam" },
+    { name: "Kakinada Gottam Kaja", price: 30.0, category: "Sweets", type: "Veg", subType: "Ghee" },
+    { name: "Tapeswaram Madatha Kaja", price: 35.0, category: "Sweets", type: "Veg", subType: "Ghee" },
+    { name: "Andhra Bobbatlu", price: 60.0, category: "Sweets", type: "Veg", subType: "Chana Dal" },
+    { name: "Nethi Ariselu", price: 50.0, category: "Sweets", type: "Veg", subType: "Ghee" },
+    { name: "Bellam Sunnundalu", price: 45.0, category: "Sweets", type: "Veg", subType: "Urad Dal" },
+    { name: "Poornalu / Boorelu", price: 40.0, category: "Sweets", type: "Veg", subType: "Traditional" },
+    { name: "Madugula Halwa", price: 70.0, category: "Sweets", type: "Veg", subType: "Wheat" },
+    { name: "Ghee Mysore Pak", price: 80.0, category: "Sweets", type: "Veg", subType: "Ghee" },
+    { name: "Rava Kesari", price: 60.0, category: "Sweets", type: "Veg", subType: "Semolina" },
+    { name: "Paramannam Payasam", price: 75.0, category: "Sweets", type: "Veg", subType: "Rice-Milk" },
+    { name: "Elaneer Payasam", price: 90.0, category: "Sweets", type: "Veg", subType: "Coconut-Milk" }
+];
 
 // DOM Elements
 const selectedStallTitle = document.getElementById('selected-stall-title');
@@ -92,12 +258,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Setup Listeners
 function setupEventListeners() {
-    // Search Box Input
     searchInput.addEventListener('input', () => {
         renderMenu();
     });
 
-    // Menu Category Filters
     filterBtns.forEach(btn => {
         btn.addEventListener('click', (e) => {
             filterBtns.forEach(b => b.classList.remove('active'));
@@ -107,23 +271,17 @@ function setupEventListeners() {
         });
     });
 
-    // Promo Code Application
     applyPromoBtn.addEventListener('click', applyPromoCode);
-
-    // Cart Button Check
     customerNameInput.addEventListener('input', validateCheckoutForm);
-
-    // Place Order Button
     placeOrderBtn.addEventListener('click', placeOrder);
 
-    // Manual Refresh Button
     refreshOrdersBtn.addEventListener('click', () => {
         fetchOrders();
         fetchStats();
     });
 }
 
-// Play Synthesized Audio (Zero file dependencies)
+// Play Synthesized Audio via Web Audio API (Zero file dependencies)
 function playSynthesizedSound(type) {
     try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -155,8 +313,7 @@ function playSynthesizedSound(type) {
             osc.type = 'triangle';
             gain.gain.setValueAtTime(0.12, now);
             gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
-            
-            osc.frequency.setValueAtTime(880.0, now); // A5 resonant bell base
+            osc.frequency.setValueAtTime(880.0, now); // A5
             
             const oscH = ctx.createOscillator();
             const gainH = ctx.createGain();
@@ -165,7 +322,7 @@ function playSynthesizedSound(type) {
             oscH.type = 'sine';
             gainH.gain.setValueAtTime(0.04, now);
             gainH.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
-            oscH.frequency.setValueAtTime(1320.0, now); // E6 copper resonance
+            oscH.frequency.setValueAtTime(1320.0, now); // E6
             
             osc.start(now);
             osc.stop(now + 1.2);
@@ -177,32 +334,47 @@ function playSynthesizedSound(type) {
     }
 }
 
-// 1. Fetch Master Restaurant Profile
+// 1. Fetch Master Restaurant Profile (with Local Simulator Fallback)
 async function fetchRestaurants() {
     try {
         const response = await fetch('/api/restaurants');
         if (!response.ok) throw new Error("HTTP error " + response.status);
         restaurants = await response.json();
-        
-        // Select the single master hotel "Hotel Pullamma" automatically
-        if (restaurants.length > 0) {
-            selectedRestaurant = restaurants[0];
-            selectedStallTitle.textContent = `🍛 ${selectedRestaurant.name}`;
-            selectedStallBadge.textContent = selectedRestaurant.address;
-            
-            // Sync information with profile card
-            document.querySelector('.hotel-title').textContent = selectedRestaurant.name;
-            document.querySelector('.hotel-location').textContent = `📍 ${selectedRestaurant.address}`;
-            
-            renderMenu();
-        }
+        isSimulatorMode = false;
+        document.querySelector('.status-text').textContent = "Pullamma Central Engine Online";
     } catch (error) {
-        console.error("Error loading restaurants:", error);
-        menuItemsContainer.innerHTML = `<div class="placeholder-info"><p style="color: var(--accent-nonveg)">⚠️ Failed to connect to Central Engine. Ensure Java backend is running.</p></div>`;
+        // Fall back to Local Browser Simulation Mode
+        console.warn("Java Backend not detected. Switching to Local Browser Simulator Mode...");
+        isSimulatorMode = true;
+        document.querySelector('.status-text').textContent = "Local Browser Simulator Active";
+        
+        restaurants = [{
+            name: "Hotel Pullamma",
+            address: "Main Road, Near Temple, Andhra Pradesh",
+            status: "Open",
+            menu: FALLBACK_150_ITEMS
+        }];
+        
+        // Load simulated orders from localStorage if any
+        const saved = localStorage.getItem('pullamma_orders');
+        if (saved) {
+            orders = JSON.parse(saved);
+        }
+    }
+
+    if (restaurants.length > 0) {
+        selectedRestaurant = restaurants[0];
+        selectedStallTitle.textContent = `🍛 ${selectedRestaurant.name}`;
+        selectedStallBadge.textContent = selectedRestaurant.address;
+        
+        document.querySelector('.hotel-title').textContent = selectedRestaurant.name;
+        document.querySelector('.hotel-location').textContent = `📍 ${selectedRestaurant.address}`;
+        
+        renderMenu();
     }
 }
 
-// Update the live crowd label based on active orders
+// Update the crowd label dynamically based on active orders
 function updateCrowdStatus() {
     const activeQueueCount = orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled').length;
     const crowdLabel = document.getElementById('hotel-crowd-label');
@@ -240,14 +412,11 @@ function renderMenu() {
     const items = selectedRestaurant.menu;
     const searchText = searchInput.value.toLowerCase().trim();
     
-    // Filter items
     const filteredItems = items.filter(item => {
-        // Search query check
         if (searchText && !item.name.toLowerCase().includes(searchText) && !item.category.toLowerCase().includes(searchText)) {
             return false;
         }
 
-        // Category tab check
         if (activeFilter === 'all') return true;
         if (activeFilter === 'Veg' || activeFilter === 'Non-Veg') {
             return item.type === activeFilter;
@@ -264,13 +433,11 @@ function renderMenu() {
     filteredItems.forEach((item, index) => {
         const card = document.createElement('div');
         card.className = 'menu-item-card';
-        // Add progressive animation delay for sleek card slide-up stagger effect
         card.style.animationDelay = `${Math.min(index * 0.02, 0.4)}s`;
 
         const dotClass = item.type === 'Veg' ? 'veg' : 'non-veg';
         const typeDetails = item.type === 'Veg' ? `Veg (${item.subType})` : `Non-Veg (Protein: ${item.subType})`;
 
-        // Get calories and rating metadata dynamically with deterministic hash fallbacks
         let cals = 280;
         let rating = "4.7 ★";
         if (ITEM_META[item.name]) {
@@ -281,8 +448,8 @@ function renderMenu() {
             for (let i = 0; i < item.name.length; i++) {
                 hash += item.name.charCodeAt(i);
             }
-            cals = 80 + (hash % 500); // 80 to 580 kcal
-            rating = (4.4 + (hash % 6) * 0.1).toFixed(1) + " ★"; // 4.4 to 4.9 ★
+            cals = 80 + (hash % 500); 
+            rating = (4.4 + (hash % 6) * 0.1).toFixed(1) + " ★"; 
         }
 
         card.innerHTML = `
@@ -406,7 +573,7 @@ function validateCheckoutForm() {
     placeOrderBtn.disabled = !(name && hasItems);
 }
 
-// 4. Place Order API Call
+// 4. Place Order API Call / Local Simulator
 async function placeOrder() {
     const name = customerNameInput.value.trim();
     if (!name || cart.length === 0) return;
@@ -416,71 +583,131 @@ async function placeOrder() {
 
     const payload = {
         customerName: name,
-        items: cart.map(item => item.name),
+        items: cart.map(item => ({ name: item.name, price: item.price, type: item.type })),
         discount: appliedDiscount
     };
 
-    try {
-        const response = await fetch('/api/orders', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(payload)
-        });
+    if (isSimulatorMode) {
+        // Run simulated order placement inside the browser
+        setTimeout(() => {
+            const newOrderNo = orders.length + 1;
+            
+            // Calculate final price locally
+            let subtotal = 0;
+            cart.forEach(i => subtotal += i.price);
+            const finalPrice = Math.round((subtotal - (subtotal * (appliedDiscount / 100))) * 100) / 100;
 
-        if (!response.ok) throw new Error("Failed to place order");
+            const newOrder = {
+                orderNo: newOrderNo,
+                customerName: name,
+                items: cart,
+                discountApplied: appliedDiscount,
+                finalPrice: finalPrice,
+                status: "Pending"
+            };
 
-        const placedOrder = await response.json();
-        
-        // Play success chime
-        playSynthesizedSound('order-placed');
+            orders.push(newOrder);
+            localStorage.setItem('pullamma_orders', JSON.stringify(orders));
 
-        // Reset cart
-        cart = [];
-        promoCodeInput.value = "";
-        appliedDiscount = 0.0;
-        promoCodeApplied = "";
-        promoFeedback.textContent = "";
-        renderCart();
-        validateCheckoutForm();
-        
-        placeOrderBtn.textContent = "⚡ Send Order to Pullamma Kitchen";
-        
-        // Refresh stats & timeline
-        fetchOrders();
-        fetchStats();
+            playSynthesizedSound('order-placed');
+            clearCartForm();
 
-    } catch (error) {
-        console.error("Order error:", error);
-        alert("Failed to connect to server. Order cancelled.");
-        placeOrderBtn.disabled = false;
-        placeOrderBtn.textContent = "⚡ Send Order to Pullamma Kitchen";
+            // Simulate kitchen cooking steps automatically
+            simulateKitchenCooking(newOrderNo);
+
+            renderOrders();
+            updateCrowdStatus();
+            fetchStats();
+        }, 800);
+    } else {
+        // Send order to Java server
+        try {
+            const response = await fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    customerName: name,
+                    items: cart.map(item => item.name),
+                    discount: appliedDiscount
+                })
+            });
+
+            if (!response.ok) throw new Error("Failed to place order");
+
+            playSynthesizedSound('order-placed');
+            clearCartForm();
+            fetchOrders();
+            fetchStats();
+        } catch (error) {
+            console.error("Order error:", error);
+            alert("Connection lost. Retrying via Local Simulator...");
+        }
     }
 }
 
-// 5. Fetch & Render Orders (Live Tracking)
+function clearCartForm() {
+    cart = [];
+    promoCodeInput.value = "";
+    appliedDiscount = 0.0;
+    promoCodeApplied = "";
+    promoFeedback.textContent = "";
+    renderCart();
+    validateCheckoutForm();
+    placeOrderBtn.textContent = "⚡ Send Order to Pullamma Kitchen";
+    document.querySelector('.order-tracking-section').scrollIntoView({ behavior: 'smooth' });
+}
+
+// Simulated Cooking Steps (Automatic pipeline progression)
+function simulateKitchenCooking(orderNo) {
+    // 1. Advance to Preparing in 3 seconds
+    setTimeout(() => {
+        const order = orders.find(o => o.orderNo === orderNo);
+        if (order && order.status === 'Pending') {
+            order.status = "Preparing";
+            localStorage.setItem('pullamma_orders', JSON.stringify(orders));
+            renderOrders();
+            updateCrowdStatus();
+        }
+    }, 3000);
+
+    // 2. Advance to Ready in 7 seconds and play temple bell chime
+    setTimeout(() => {
+        const order = orders.find(o => o.orderNo === orderNo);
+        if (order && order.status === 'Preparing') {
+            order.status = "Ready";
+            localStorage.setItem('pullamma_orders', JSON.stringify(orders));
+            playSynthesizedSound('food-ready');
+            renderOrders();
+            updateCrowdStatus();
+        }
+    }, 8000);
+}
+
+// 5. Fetch & Render Orders (Live Tracking / Local Simulator support)
 async function fetchOrders() {
-    try {
-        const response = await fetch('/api/orders');
-        if (!response.ok) throw new Error("HTTP " + response.status);
-        const fetchedOrders = await response.json();
-        
-        detectStatusChanges(fetchedOrders);
-
-        orders = fetchedOrders;
+    if (isSimulatorMode) {
+        // Sim Mode: values are already loaded in memory
         renderOrders();
-        updateCrowdStatus(); // dynamically calculate kitchen crowd density
-    } catch (error) {
-        console.error("Error loading orders:", error);
+        updateCrowdStatus();
+    } else {
+        try {
+            const response = await fetch('/api/orders');
+            if (!response.ok) throw new Error("HTTP " + response.status);
+            const fetchedOrders = await response.json();
+            
+            detectStatusChanges(fetchedOrders);
+            orders = fetchedOrders;
+            renderOrders();
+            updateCrowdStatus();
+        } catch (error) {
+            console.error("Error loading orders:", error);
+        }
     }
 }
 
-// Sound chime detection on status update
 function detectStatusChanges(newOrders) {
     newOrders.forEach(newO => {
         const oldO = orders.find(o => o.orderNo === newO.orderNo);
-        // Play temple bell sound if status transitioned to "Ready"
         if (oldO && oldO.status !== 'Ready' && newO.status === 'Ready') {
             playSynthesizedSound('food-ready');
         }
@@ -492,7 +719,7 @@ function renderOrders() {
         ordersTimelineContainer.innerHTML = `
             <div class="empty-orders-message">
                 <span class="clock-icon">🕒</span>
-                <p>No active orders in the kitchen. Order now to track.</p>
+                <p>No active orders. Place an order to track.</p>
             </div>`;
         return;
     }
@@ -584,41 +811,84 @@ function renderOrders() {
     });
 }
 
-// Advance status of order (Simulate Kitchen)
+// Advance status of order
 async function advanceOrderStatus(orderNo) {
-    try {
-        const response = await fetch('/api/orders/update', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ orderNo: orderNo })
-        });
-        
-        if (!response.ok) throw new Error("Failed to advance order status");
-        
-        fetchOrders();
-        fetchStats();
-    } catch (error) {
-        console.error("Error advancing status:", error);
+    if (isSimulatorMode) {
+        const order = orders.find(o => o.orderNo === orderNo);
+        if (order) {
+            const current = order.status;
+            if (current === "Pending") {
+                order.status = "Preparing";
+            } else if (current === "Preparing") {
+                order.status = "Ready";
+                playSynthesizedSound('food-ready');
+            } else if (current === "Ready") {
+                order.status = "Delivered";
+            }
+            localStorage.setItem('pullamma_orders', JSON.stringify(orders));
+            renderOrders();
+            updateCrowdStatus();
+            fetchStats();
+        }
+    } else {
+        try {
+            const response = await fetch('/api/orders/update', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ orderNo: orderNo })
+            });
+            if (!response.ok) throw new Error("Failed to advance status");
+            fetchOrders();
+            fetchStats();
+        } catch (error) {
+            console.error("Error advancing status:", error);
+        }
     }
 }
 
-// 6. Fetch & Render Dashboard Statistics
+// 6. Fetch Dashboard Statistics
 async function fetchStats() {
-    try {
-        const response = await fetch('/api/stats');
-        if (!response.ok) throw new Error("HTTP " + response.status);
-        const stats = await response.json();
-
-        statRevenue.textContent = `₹${stats.totalRevenue.toFixed(2)}`;
-        statOrders.textContent = stats.totalOrders;
-        statTopItem.textContent = stats.topSellingItem !== "N/A" ? stats.topSellingItem : "None";
+    if (isSimulatorMode) {
+        // Calculate stats locally
+        let totalRevenue = 0.0;
+        const itemSales = {};
         
-        const activeQueueCount = orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled').length;
-        statQueue.textContent = activeQueueCount;
+        orders.forEach(o => {
+            if (o.status !== 'Cancelled') {
+                totalRevenue += o.finalPrice;
+            }
+            o.items.forEach(item => {
+                itemSales[item.name] = (itemSales[item.name] || 0) + 1;
+            });
+        });
 
-    } catch (error) {
-        console.error("Error loading stats:", error);
+        let topItem = "N/A";
+        let topSales = 0;
+        for (const name in itemSales) {
+            if (itemSales[name] > topSales) {
+                topSales = itemSales[name];
+                topItem = name;
+            }
+        }
+
+        statRevenue.textContent = `₹${totalRevenue.toFixed(2)}`;
+        statOrders.textContent = orders.length;
+        statTopItem.textContent = topItem !== "N/A" ? topItem : "None";
+        statQueue.textContent = orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled').length;
+    } else {
+        try {
+            const response = await fetch('/api/stats');
+            if (!response.ok) throw new Error("HTTP " + response.status);
+            const stats = await response.json();
+
+            statRevenue.textContent = `₹${stats.totalRevenue.toFixed(2)}`;
+            statOrders.textContent = stats.totalOrders;
+            statTopItem.textContent = stats.topSellingItem !== "N/A" ? stats.topSellingItem : "None";
+            
+            const activeQueueCount = orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled').length;
+            statQueue.textContent = activeQueueCount;
+        } catch (error) {
+            console.error("Error loading stats:", error);
+        }
     }
 }
