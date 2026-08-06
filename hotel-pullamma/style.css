@@ -648,51 +648,22 @@ input:checked + .slider:before {
     margin-top: 4px;
 }
 
-/* Card Right Wrapper for Image and Overlay Pill */
-.item-right-wrapper {
+.item-right {
     display: flex;
-    flex-direction: column;
     align-items: center;
-    position: relative;
-    margin-left: 1rem;
+    justify-content: flex-end;
+    margin-left: 1.5rem;
     flex-shrink: 0;
 }
 
-/* High-Quality Card Images Box */
-.item-image-box {
-    width: 100px;
-    height: 100px;
-    border-radius: 12px;
-    overflow: hidden;
-    position: relative;
-    border: 1px solid rgba(252, 128, 25, 0.08);
-}
-
-.item-image-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.4s ease;
-}
-
-.menu-item-card:hover .item-image-box img {
-    transform: scale(1.08);
-}
-
-/* Swiggy Style Buttons and Quantity Selector Pill Overlaying the Image Bottom Center */
 .add-cart-btn-swiggy {
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 5;
     background: #171513; /* Pure dark matching theme card background */
     border: 1.5px solid var(--primary);
     color: var(--primary);
     font-weight: 700;
-    padding: 0.45rem 1.25rem;
+    padding: 0.55rem 1.4rem;
     border-radius: 8px;
-    font-size: 12px;
+    font-size: 13px;
     cursor: pointer;
     text-align: center;
     min-width: 90px;
@@ -707,11 +678,6 @@ input:checked + .slider:before {
 }
 
 .qty-pill-swiggy {
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%) scale(1);
-    z-index: 5;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -726,8 +692,8 @@ input:checked + .slider:before {
 }
 
 @keyframes scaleUpPill {
-    0% { transform: translateX(-50%) scale(0.85); opacity: 0; }
-    100% { transform: translateX(-50%) scale(1); opacity: 1; }
+    0% { transform: scale(0.85); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
 }
 
 .qty-btn-swiggy {

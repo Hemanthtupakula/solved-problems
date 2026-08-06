@@ -482,21 +482,6 @@ function renderMenu() {
             actionMarkup = `<button class="add-cart-btn-swiggy add-btn" data-name="${item.name}">ADD</button>`;
         }
 
-        // Determine category image path
-        let categoryImage = "images/drinks_sweets.jpg";
-        const cat = item.category.toLowerCase();
-        if (cat === "breakfast") {
-            categoryImage = "images/breakfast.jpg";
-        } else if (cat === "lunch") {
-            categoryImage = "images/lunch.jpg";
-        } else if (cat === "dinner") {
-            categoryImage = "images/dinner.jpg";
-        } else if (cat === "pachadi") {
-            categoryImage = "images/pachadi.jpg";
-        } else if (cat === "snacks") {
-            categoryImage = "images/snacks.jpg";
-        }
-
         card.innerHTML = `
             <div class="item-left">
                 <div class="item-badge-row">
@@ -508,10 +493,7 @@ function renderMenu() {
                 <span class="item-desc">Fresh, authentic Andhra dish prepared in Hotel Pullamma's kitchen.</span>
                 <span class="item-price">₹${item.price.toFixed(2)}</span>
             </div>
-            <div class="item-right-wrapper">
-                <div class="item-image-box">
-                    <img src="${categoryImage}" alt="${item.name}">
-                </div>
+            <div class="item-right">
                 ${actionMarkup}
             </div>
         `;
