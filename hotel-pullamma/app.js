@@ -541,7 +541,6 @@ function removeFromCart(itemName) {
     renderMenu();
     validateCheckoutForm();
 }
-
 function renderCart() {
     const cartKeys = Object.keys(cart);
 
@@ -554,11 +553,13 @@ function renderCart() {
         billSubtotal.textContent = "₹0.00";
         billDiscountRow.classList.add('hidden');
         
-        // Hide fees when cart is empty
-        document.getElementById('bill-delivery-row').classList.add('hidden');
-        document.getElementById('bill-packaging-row').classList.add('hidden');
-        document.getElementById('bill-tax-row').classList.add('hidden');
+        document.getElementById('bill-delivery-row').classList.remove('hidden');
+        document.getElementById('bill-packaging-row').classList.remove('hidden');
+        document.getElementById('bill-tax-row').classList.remove('hidden');
         
+        billDelivery.textContent = `₹${DELIVERY_FEE.toFixed(2)}`;
+        billPackaging.textContent = `₹${PACKAGING_FEE.toFixed(2)}`;
+        billTax.textContent = "₹0.00";
         billTotal.textContent = "₹0.00";
         return;
     }
