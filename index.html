@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Pullamma | Traditional Andhra Food Portal</title>
+    <!-- Outfit & Inter Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="glass-bg"></div>
+    <div class="glow-orb" id="orb-1"></div>
+    <div class="glow-orb" id="orb-2"></div>
+    <div class="glow-orb" id="orb-3"></div>
+
+    <div class="container">
+        <!-- Dashboard Header -->
+        <header class="app-header">
+            <div class="brand">
+                <div class="logo-box">
+                    <span class="logo-icon">🍛</span>
+                </div>
+                <div>
+                    <h1>Hotel Pullamma</h1>
+                    <p class="subtitle">150 Traditional Andhra Pradesh Dishes & Live Tracker</p>
+                </div>
+            </div>
+            <div class="system-status">
+                <span class="status-indicator online"></span>
+                <span class="status-text">Pullamma Central Engine Online</span>
+            </div>
+        </header>
+
+        <!-- Stats Overview Row -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">🪙</div>
+                <div class="stat-info">
+                    <span class="stat-label">Total Revenue</span>
+                    <h3 class="stat-value" id="stat-revenue">₹0.00</h3>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🎴</div>
+                <div class="stat-info">
+                    <span class="stat-label">Total Orders</span>
+                    <h3 class="stat-value" id="stat-orders">0</h3>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🏆</div>
+                <div class="stat-info">
+                    <span class="stat-label">Top Selling Dish</span>
+                    <h3 class="stat-value" id="stat-top-item">N/A</h3>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🔥</div>
+                <div class="stat-info">
+                    <span class="stat-label">Active Kitchen Queue</span>
+                    <h3 class="stat-value" id="stat-queue">0</h3>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main 2-Column Professional Dashboard Layout -->
+        <div class="dashboard-layout">
+            
+            <!-- Left Column: Menu Explorer & Hotel Profile Header -->
+            <section class="panel-section" id="menu-panel">
+                <!-- Hotel Profile Header Card -->
+                <div class="hotel-profile-card" id="hotel-profile-card">
+                    <div class="hotel-profile-left">
+                        <span class="hotel-avatar">👩‍🍳</span>
+                        <div class="hotel-identity">
+                            <h2 class="hotel-title">Hotel Pullamma</h2>
+                            <p class="hotel-location">📍 Main Road, Near Temple, Andhra Pradesh</p>
+                            <p class="hotel-rating">⭐ 4.9 (1,250+ reviews) &bull; ⏱️ Avg Prep Time: 10-15 mins</p>
+                        </div>
+                    </div>
+                    <div class="hotel-profile-right">
+                        <span class="crowd-indicator-dot online"></span>
+                        <span class="crowd-label" id="hotel-crowd-label">Low Queue</span>
+                    </div>
+                </div>
+
+                <div class="panel-header search-header">
+                    <div class="search-row">
+                        <input type="text" id="search-input" placeholder="🔍 Search among 150 traditional dishes...">
+                    </div>
+                    <div class="menu-filters-wrapper">
+                        <div class="menu-filters">
+                            <button class="filter-btn active" data-filter="all">All</button>
+                            <button class="filter-btn" data-filter="Veg">🟢 Veg</button>
+                            <button class="filter-btn" data-filter="Non-Veg">🔴 Non-Veg</button>
+                            <button class="filter-btn" data-filter="Breakfast">🥞 Breakfast</button>
+                            <button class="filter-btn" data-filter="Lunch">🍛 Lunch</button>
+                            <button class="filter-btn" data-filter="Dinner">🍲 Dinner</button>
+                            <button class="filter-btn" data-filter="Pachadi">🌶️ Pachadi & Podi</button>
+                            <button class="filter-btn" data-filter="Snacks">🍿 Snacks</button>
+                            <button class="filter-btn" data-filter="Drinks">🥤 Drinks</button>
+                            <button class="filter-btn" data-filter="Sweets">🍯 Sweets</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="menu-items-scroll">
+                    <div class="menu-items-grid" id="menu-items-container">
+                        <div class="loading-spinner">Loading 150 authentic dishes...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Column: Cart & Live Tracker Pipeline stacked -->
+            <div class="sidebar-layout">
+                <!-- Cart & Checkout -->
+                <section class="panel-section" id="cart-panel">
+                    <div class="panel-header">
+                        <h2>🛒 Selected Order Details</h2>
+                        <p>Review items & apply promotions</p>
+                    </div>
+                    <div class="cart-container">
+                        <div class="cart-items" id="cart-items-container">
+                            <div class="empty-cart-message">
+                                <span class="cart-icon">🛒</span>
+                                <p>Your leaf is empty.<br>Add items from the menu to start ordering.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="cart-checkout-form">
+                            <div class="input-group">
+                                <label for="customer-name">Customer Name</label>
+                                <input type="text" id="customer-name" placeholder="Enter name for pickup" required>
+                            </div>
+                            
+                            <div class="input-group">
+                                <label for="promo-code">Promo Code / Coupon</label>
+                                <div class="promo-row">
+                                    <input type="text" id="promo-code" placeholder="e.g., DOSA20, PULLAMMA50">
+                                    <button type="button" id="apply-promo-btn">Apply</button>
+                                </div>
+                                <span class="promo-feedback" id="promo-feedback"></span>
+                            </div>
+
+                            <hr class="divider">
+                            
+                            <div class="bill-details">
+                                <div class="bill-row">
+                                    <span>Subtotal</span>
+                                    <span id="bill-subtotal">₹0.00</span>
+                                </div>
+                                <div class="bill-row discount-row hidden" id="bill-discount-row">
+                                    <span>Discount (<span id="discount-pct">0</span>%)</span>
+                                    <span id="bill-discount">-₹0.00</span>
+                                </div>
+                                <div class="bill-row total-row">
+                                    <span>Grand Total</span>
+                                    <span id="bill-total">₹0.00</span>
+                                </div>
+                            </div>
+
+                            <button type="button" class="btn-primary" id="place-order-btn" disabled>
+                                ⚡ Send Order to Pullamma Kitchen
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Live Kitchen Pipeline -->
+                <section class="panel-section order-tracking-section">
+                    <div class="panel-header order-tracker-header">
+                        <div>
+                            <h2>⏱️ Live Kitchen Pipeline</h2>
+                            <p>Track your food. Temple-bell ring alerts when food is ready!</p>
+                        </div>
+                        <button class="btn-secondary" id="refresh-orders-btn">🔄 Refresh</button>
+                    </div>
+                    
+                    <div class="orders-timeline" id="orders-timeline-container">
+                        <div class="empty-orders-message">
+                            <span class="clock-icon">🕒</span>
+                            <p>No active orders. Place an order to track.</p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
