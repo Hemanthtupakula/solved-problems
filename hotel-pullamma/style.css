@@ -233,51 +233,37 @@ h1, h2, h3, .stat-value, .hotel-title {
     margin-top: 2px;
 }
 
-/* Professional 2-Column Dashboard Layout */
+/* Professional 2-Column Dashboard Layout (Height made auto to show everything) */
 .dashboard-layout {
     display: grid;
-    grid-template-columns: 1.65fr 1.35fr;
+    grid-template-columns: 1.62fr 1.38fr;
     gap: 1.75rem;
-    height: 780px;
+    margin-bottom: 2rem;
     animation: slideUpFade 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+}
+
+/* Left side explorer has a nice scroll height, while right side expands naturally */
+#menu-panel {
+    height: 850px;
 }
 
 .sidebar-layout {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
-    height: 100%;
-    overflow-y: auto;
-    padding-right: 2px;
-}
-
-/* Scrollbar styling for sidebar layout */
-.sidebar-layout::-webkit-scrollbar {
-    width: 5px;
-}
-.sidebar-layout::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 5px;
 }
 
 #cart-panel {
-    flex: 1.4;
-    min-height: 480px;
+    height: auto;
 }
 
 .order-tracking-section {
-    flex: 1;
-    min-height: 320px;
+    height: auto;
 }
 
 @media (max-width: 1024px) {
     .dashboard-layout {
         grid-template-columns: 1fr;
-        height: auto;
-    }
-    .sidebar-layout {
-        height: auto;
-        overflow-y: visible;
     }
 }
 
@@ -568,11 +554,12 @@ input:checked + .slider:before {
 .menu-item-card {
     background: rgba(255, 255, 255, 0.01);
     border: 1px solid var(--border-color);
-    border-radius: 14px;
-    padding: 1.1rem;
+    border-radius: 16px;
+    padding: 1.25rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 1.5rem;
     transition: border-color 0.3s ease, background-color 0.3s ease, transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.15);
     animation: slideUpFade 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -643,13 +630,15 @@ input:checked + .slider:before {
 }
 
 .item-name {
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
 }
 
 .item-desc {
     font-size: 12px;
     color: var(--text-muted);
+    line-height: 1.4;
 }
 
 .item-price {
@@ -659,24 +648,56 @@ input:checked + .slider:before {
     margin-top: 4px;
 }
 
-.item-right {
+/* Card Right Wrapper for Image and Overlay Pill */
+.item-right-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
     margin-left: 1rem;
+    flex-shrink: 0;
 }
 
-/* Swiggy Style Buttons and Quantity Selector Pill */
+/* High-Quality Card Images Box */
+.item-image-box {
+    width: 100px;
+    height: 100px;
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(252, 128, 25, 0.08);
+}
+
+.item-image-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+}
+
+.menu-item-card:hover .item-image-box img {
+    transform: scale(1.08);
+}
+
+/* Swiggy Style Buttons and Quantity Selector Pill Overlaying the Image Bottom Center */
 .add-cart-btn-swiggy {
-    background: rgba(255, 255, 255, 0.01);
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 5;
+    background: #171513; /* Pure dark matching theme card background */
     border: 1.5px solid var(--primary);
     color: var(--primary);
     font-weight: 700;
-    padding: 0.5rem 1.4rem;
+    padding: 0.45rem 1.25rem;
     border-radius: 8px;
-    font-size: 13px;
+    font-size: 12px;
     cursor: pointer;
     text-align: center;
-    min-width: 95px;
+    min-width: 90px;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 8px rgba(252, 128, 25, 0.03);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
 }
 
 .add-cart-btn-swiggy:hover {
@@ -686,6 +707,11 @@ input:checked + .slider:before {
 }
 
 .qty-pill-swiggy {
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%) scale(1);
+    z-index: 5;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -693,15 +719,15 @@ input:checked + .slider:before {
     border: 1.5px solid var(--primary);
     color: white;
     border-radius: 8px;
-    min-width: 95px;
+    min-width: 90px;
     overflow: hidden;
     box-shadow: 0 4px 12px var(--primary-glow);
     animation: scaleUpPill 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 @keyframes scaleUpPill {
-    0% { transform: scale(0.85); opacity: 0; }
-    100% { transform: scale(1); opacity: 1; }
+    0% { transform: translateX(-50%) scale(0.85); opacity: 0; }
+    100% { transform: translateX(-50%) scale(1); opacity: 1; }
 }
 
 .qty-btn-swiggy {
@@ -710,7 +736,7 @@ input:checked + .slider:before {
     color: white;
     font-size: 16px;
     font-weight: 700;
-    padding: 0.4rem 0.6rem;
+    padding: 0.35rem 0.5rem;
     cursor: pointer;
     flex: 1;
     text-align: center;
@@ -778,7 +804,7 @@ input:checked + .slider:before {
     margin-bottom: 0.75rem;
 }
 
-/* Swiggy Style Cart Items */
+/* Cart Items Styling */
 .cart-item-swiggy {
     display: flex;
     justify-content: space-between;
@@ -938,7 +964,7 @@ input:checked + .slider:before {
     background: var(--border-color);
 }
 
-/* Swiggy Billing Rows */
+/* Billing Rows */
 .bill-details {
     display: flex;
     flex-direction: column;
