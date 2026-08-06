@@ -1,13 +1,13 @@
-/* Pullamma South Indian Theme Tokens */
+/* Pullamma Swiggy Rebrand Theme Tokens */
 :root {
-    --bg-dark: #0a0908; /* Deep warm stone/coffee bean dark */
-    --card-bg: rgba(24, 20, 17, 0.78); /* Warm charcoal */
-    --border-color: rgba(245, 158, 11, 0.08); /* Warm gold hints */
-    --border-hover: rgba(245, 158, 11, 0.18);
+    --bg-dark: #070605; /* Charcoal coffee black */
+    --card-bg: rgba(22, 18, 15, 0.82); /* Warm stone dark */
+    --border-color: rgba(252, 128, 25, 0.06); /* Soft orange tint borders */
+    --border-hover: rgba(252, 128, 25, 0.15);
     
-    --primary: #d97706; /* Rich turmeric copper */
-    --primary-glow: rgba(217, 119, 6, 0.4);
-    --primary-hover: #b45309; /* Roasted bean brown */
+    --primary: #fc8019; /* Swiggy Orange */
+    --primary-glow: rgba(252, 128, 25, 0.45);
+    --primary-hover: #e17013;
     
     --accent-veg: #16a34a; /* Fresh banana leaf green */
     --veg-glow: rgba(22, 163, 74, 0.3);
@@ -50,7 +50,7 @@ h1, h2, h3, .stat-value, .hotel-title {
     left: 0;
     width: 100vw;
     height: 100vh;
-    background: radial-gradient(circle at 50% 50%, rgba(30, 20, 10, 0.25) 0%, rgba(10, 9, 8, 0.98) 100%);
+    background: radial-gradient(circle at 50% 50%, rgba(35, 18, 10, 0.22) 0%, rgba(7, 6, 5, 0.99) 100%);
     z-index: -2;
 }
 
@@ -60,7 +60,7 @@ h1, h2, h3, .stat-value, .hotel-title {
     height: 35vw;
     border-radius: 50%;
     filter: blur(140px);
-    opacity: 0.12;
+    opacity: 0.1;
     z-index: -1;
     animation: orbFloat 25s infinite alternate ease-in-out;
 }
@@ -84,7 +84,7 @@ h1, h2, h3, .stat-value, .hotel-title {
     left: 45vw;
     width: 25vw;
     height: 25vw;
-    opacity: 0.05;
+    opacity: 0.04;
 }
 
 @keyframes orbFloat {
@@ -131,13 +131,13 @@ h1, h2, h3, .stat-value, .hotel-title {
 .logo-box {
     width: 52px;
     height: 52px;
-    background: linear-gradient(135deg, var(--accent-veg), var(--primary));
+    background: linear-gradient(135deg, var(--primary), var(--primary-hover));
     border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 28px;
-    box-shadow: 0 0 20px rgba(22, 163, 74, 0.3);
+    box-shadow: 0 0 20px rgba(252, 128, 25, 0.3);
     transition: transform 0.3s;
 }
 
@@ -148,7 +148,7 @@ h1, h2, h3, .stat-value, .hotel-title {
 .brand h1 {
     font-size: 28px;
     letter-spacing: -0.5px;
-    background: linear-gradient(to right, #ffffff, #fef08a);
+    background: linear-gradient(to right, #ffffff, #ffedd5);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -162,7 +162,7 @@ h1, h2, h3, .stat-value, .hotel-title {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.02);
     padding: 0.5rem 1rem;
     border-radius: 20px;
     border: 1px solid var(--border-color);
@@ -203,7 +203,7 @@ h1, h2, h3, .stat-value, .hotel-title {
 .stat-card:hover {
     transform: translateY(-2px);
     border-color: var(--border-hover);
-    box-shadow: 0 4px 15px rgba(217, 119, 6, 0.08);
+    box-shadow: 0 4px 15px rgba(252, 128, 25, 0.06);
 }
 
 .stat-icon {
@@ -236,9 +236,9 @@ h1, h2, h3, .stat-value, .hotel-title {
 /* Professional 2-Column Dashboard Layout */
 .dashboard-layout {
     display: grid;
-    grid-template-columns: 1.7fr 1.3fr;
+    grid-template-columns: 1.65fr 1.35fr;
     gap: 1.75rem;
-    height: 720px;
+    height: 780px;
     animation: slideUpFade 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
 }
 
@@ -261,13 +261,13 @@ h1, h2, h3, .stat-value, .hotel-title {
 }
 
 #cart-panel {
-    flex: 1.2;
-    min-height: 380px;
+    flex: 1.4;
+    min-height: 480px;
 }
 
 .order-tracking-section {
     flex: 1;
-    min-height: 300px;
+    min-height: 320px;
 }
 
 @media (max-width: 1024px) {
@@ -312,7 +312,7 @@ h1, h2, h3, .stat-value, .hotel-title {
 
 /* Hotel Profile Header Card */
 .hotel-profile-card {
-    background: linear-gradient(135deg, rgba(217, 119, 6, 0.06) 0%, rgba(24, 20, 17, 0.85) 100%);
+    background: linear-gradient(135deg, rgba(252, 128, 25, 0.05) 0%, rgba(22, 18, 15, 0.85) 100%);
     border-bottom: 1px solid var(--border-color);
     padding: 1.5rem;
     display: flex;
@@ -339,7 +339,7 @@ h1, h2, h3, .stat-value, .hotel-title {
     align-items: center;
     justify-content: center;
     animation: rotateBorder 12s linear infinite;
-    box-shadow: 0 0 10px rgba(217, 119, 6, 0.1);
+    box-shadow: 0 0 10px rgba(252, 128, 25, 0.1);
 }
 
 @keyframes rotateBorder {
@@ -355,7 +355,7 @@ h1, h2, h3, .stat-value, .hotel-title {
 .hotel-title {
     font-size: 22px;
     color: #ffffff;
-    background: linear-gradient(to right, #ffffff, #fef08a);
+    background: linear-gradient(to right, #ffffff, #ffedd5);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -401,13 +401,16 @@ h1, h2, h3, .stat-value, .hotel-title {
     padding: 1.15rem 1.25rem 0.85rem 1.25rem;
 }
 
-.search-row {
+.search-row.flex-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.25rem;
     margin-bottom: 12px;
-    width: 100%;
 }
 
-.search-row input {
-    width: 100%;
+.search-row.flex-row input {
+    flex: 1;
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--border-color);
     border-radius: 10px;
@@ -417,11 +420,83 @@ h1, h2, h3, .stat-value, .hotel-title {
     transition: all 0.3s ease;
 }
 
-.search-row input:focus {
+.search-row.flex-row input:focus {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 10px var(--primary-glow);
     background: rgba(255, 255, 255, 0.04);
+}
+
+/* Veg Toggle Switch */
+.veg-toggle-container {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    background: rgba(22, 163, 74, 0.04);
+    border: 1px solid rgba(22, 163, 74, 0.12);
+    padding: 0.55rem 0.9rem;
+    border-radius: 10px;
+    white-space: nowrap;
+}
+
+.veg-toggle-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent-veg);
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 38px;
+    height: 20px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(255, 255, 255, 0.08);
+    transition: .3s;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 12px;
+    width: 12px;
+    left: 3px;
+    bottom: 3px;
+    background-color: var(--text-muted);
+    transition: .3s;
+}
+
+input:checked + .slider {
+    background-color: var(--accent-veg);
+    box-shadow: 0 0 10px var(--veg-glow);
+}
+
+input:checked + .slider:before {
+    transform: translateX(18px);
+    background-color: #ffffff;
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
 }
 
 /* Category Filters Horizontal Scroll */
@@ -509,9 +584,9 @@ h1, h2, h3, .stat-value, .hotel-title {
 
 .menu-item-card:hover {
     background: rgba(255, 255, 255, 0.03);
-    border-color: rgba(245, 158, 11, 0.18);
+    border-color: rgba(252, 128, 25, 0.15);
     transform: translateY(-2px) scale(1.005);
-    box-shadow: 0 4px 20px rgba(217, 119, 6, 0.08);
+    box-shadow: 0 4px 20px rgba(252, 128, 25, 0.05);
 }
 
 .item-left {
@@ -588,24 +663,69 @@ h1, h2, h3, .stat-value, .hotel-title {
     margin-left: 1rem;
 }
 
-.add-cart-btn {
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    color: var(--text-main);
-    padding: 0.55rem 1.1rem;
+/* Swiggy Style Buttons and Quantity Selector Pill */
+.add-cart-btn-swiggy {
+    background: rgba(255, 255, 255, 0.01);
+    border: 1.5px solid var(--primary);
+    color: var(--primary);
+    font-weight: 700;
+    padding: 0.5rem 1.4rem;
     border-radius: 8px;
-    cursor: pointer;
     font-size: 13px;
-    font-weight: 500;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    text-align: center;
+    min-width: 95px;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(252, 128, 25, 0.03);
 }
 
-.add-cart-btn:hover {
+.add-cart-btn-swiggy:hover {
     background: var(--primary);
-    border-color: var(--primary);
     color: white;
-    transform: scale(1.05);
-    box-shadow: 0 0 10px var(--primary-glow);
+    box-shadow: 0 4px 12px var(--primary-glow);
+}
+
+.qty-pill-swiggy {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--primary);
+    border: 1.5px solid var(--primary);
+    color: white;
+    border-radius: 8px;
+    min-width: 95px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px var(--primary-glow);
+    animation: scaleUpPill 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes scaleUpPill {
+    0% { transform: scale(0.85); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.qty-btn-swiggy {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 0.4rem 0.6rem;
+    cursor: pointer;
+    flex: 1;
+    text-align: center;
+    transition: background 0.15s;
+}
+
+.qty-btn-swiggy:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.qty-val-swiggy {
+    font-size: 13px;
+    font-weight: 700;
+    width: 22px;
+    text-align: center;
 }
 
 /* Placeholders */
@@ -658,44 +778,80 @@ h1, h2, h3, .stat-value, .hotel-title {
     margin-bottom: 0.75rem;
 }
 
-.cart-item {
+/* Swiggy Style Cart Items */
+.cart-item-swiggy {
     display: flex;
     justify-content: space-between;
     align-items: center;
     background: rgba(255, 255, 255, 0.01);
-    padding: 0.65rem 0.85rem;
-    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    border-radius: 12px;
     border: 1px solid var(--border-color);
     font-size: 13px;
     animation: slideUpFade 0.3s ease both;
 }
 
-.cart-item-name {
-    font-weight: 500;
+.cart-item-info-swiggy {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    flex: 1;
 }
 
-.cart-item-meta {
+.cart-item-name-swiggy {
+    font-weight: 600;
+    color: #ffffff;
+}
+
+.cart-item-category-swiggy {
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.cart-item-actions-swiggy {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 1rem;
 }
 
-.cart-item-price {
-    font-weight: 600;
+.cart-qty-pill {
+    display: flex;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    overflow: hidden;
 }
 
-.remove-cart-btn {
+.cart-qty-btn {
     background: transparent;
     border: none;
-    color: var(--text-muted);
-    cursor: pointer;
+    color: var(--primary);
     font-size: 14px;
-    padding: 0.2rem;
-    transition: color 0.2s;
+    font-weight: 700;
+    padding: 0.2rem 0.5rem;
+    cursor: pointer;
+    transition: background 0.2s;
 }
 
-.remove-cart-btn:hover {
-    color: var(--accent-nonveg);
+.cart-qty-btn:hover {
+    background: rgba(252, 128, 25, 0.1);
+}
+
+.cart-qty-val {
+    font-size: 12px;
+    font-weight: 700;
+    width: 18px;
+    text-align: center;
+    color: #ffffff;
+}
+
+.cart-item-price-swiggy {
+    font-weight: 700;
+    color: #ffffff;
+    min-width: 55px;
+    text-align: right;
 }
 
 .cart-checkout-form {
@@ -719,7 +875,7 @@ h1, h2, h3, .stat-value, .hotel-title {
     color: var(--text-muted);
 }
 
-.input-group input {
+.input-group input, .input-group select {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--border-color);
     border-radius: 8px;
@@ -729,7 +885,12 @@ h1, h2, h3, .stat-value, .hotel-title {
     transition: border-color 0.2s;
 }
 
-.input-group input:focus {
+.input-group select option {
+    background-color: #12100e;
+    color: white;
+}
+
+.input-group input:focus, .input-group select:focus {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 5px var(--primary-glow);
@@ -777,10 +938,11 @@ h1, h2, h3, .stat-value, .hotel-title {
     background: var(--border-color);
 }
 
+/* Swiggy Billing Rows */
 .bill-details {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.4rem;
 }
 
 .bill-row {
@@ -790,15 +952,25 @@ h1, h2, h3, .stat-value, .hotel-title {
     color: var(--text-muted);
 }
 
+.charge-row {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
 .discount-row {
     color: var(--accent-veg);
+}
+
+.bill-divider {
+    margin: 6px 0;
+    border-color: rgba(255, 255, 255, 0.05);
 }
 
 .total-row {
     font-size: 16px;
     color: white;
     font-weight: 700;
-    margin-top: 4px;
+    margin-top: 2px;
 }
 
 .hidden {
@@ -817,13 +989,13 @@ h1, h2, h3, .stat-value, .hotel-title {
     width: 100%;
     transition: all 0.2s;
     text-align: center;
-    box-shadow: 0 4px 15px rgba(217, 119, 6, 0.2);
+    box-shadow: 0 4px 15px rgba(252, 128, 25, 0.2);
 }
 
 .btn-primary:hover:not(:disabled) {
     background: var(--primary-hover);
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(217, 119, 6, 0.35);
+    box-shadow: 0 6px 20px rgba(252, 128, 25, 0.35);
 }
 
 .btn-primary:disabled {
@@ -892,7 +1064,7 @@ h1, h2, h3, .stat-value, .hotel-title {
 }
 
 .order-monitor-card:hover {
-    border-color: rgba(245, 158, 11, 0.12);
+    border-color: rgba(252, 128, 25, 0.12);
 }
 
 .order-card-top {
@@ -1017,9 +1189,9 @@ h1, h2, h3, .stat-value, .hotel-title {
 }
 
 .btn-status-sim {
-    background: rgba(217, 119, 6, 0.1);
+    background: rgba(252, 128, 25, 0.1);
     color: var(--primary);
-    border: 1px solid rgba(217, 119, 6, 0.25);
+    border: 1px solid rgba(252, 128, 25, 0.25);
     padding: 0.4rem 0.85rem;
     border-radius: 6px;
     font-size: 12px;

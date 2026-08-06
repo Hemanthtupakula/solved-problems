@@ -1,12 +1,16 @@
 // App State
 let restaurants = [];
 let orders = [];
-let cart = [];
+let cart = {}; // Tracked as { itemName: { item: Object, quantity: Number } }
 let selectedRestaurant = null;
 let activeFilter = 'all';
 let appliedDiscount = 0.0;
 let promoCodeApplied = "";
-let isSimulatorMode = false; // flag indicating if we've fallen back to browser simulation
+let isSimulatorMode = false; // fallen back to browser simulation
+
+// Swiggy Delivery Fees
+const DELIVERY_FEE = 29.0;
+const PACKAGING_FEE = 15.0;
 
 // South Indian Promo Codes
 const PROMO_CODES = {
@@ -219,9 +223,12 @@ const selectedStallBadge = document.getElementById('selected-stall-badge');
 const menuItemsContainer = document.getElementById('menu-items-container');
 const filterBtns = document.querySelectorAll('.filter-btn');
 const searchInput = document.getElementById('search-input');
+const vegOnlyToggle = document.getElementById('veg-only-toggle');
 
 const cartItemsContainer = document.getElementById('cart-items-container');
 const customerNameInput = document.getElementById('customer-name');
+const deliveryAddressSelect = document.getElementById('delivery-address');
+const paymentMethodSelect = document.getElementById('payment-method');
 const promoCodeInput = document.getElementById('promo-code');
 const applyPromoBtn = document.getElementById('apply-promo-btn');
 const promoFeedback = document.getElementById('promo-feedback');
@@ -230,6 +237,9 @@ const billSubtotal = document.getElementById('bill-subtotal');
 const billDiscountRow = document.getElementById('bill-discount-row');
 const discountPctLabel = document.getElementById('discount-pct');
 const billDiscountValue = document.getElementById('bill-discount');
+const billDelivery = document.getElementById('bill-delivery');
+const billPackaging = document.getElementById('bill-packaging');
+const billTax = document.getElementById('bill-tax');
 const billTotal = document.getElementById('bill-total');
 const placeOrderBtn = document.getElementById('place-order-btn');
 
@@ -249,7 +259,6 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchStats();
     setupEventListeners();
 
-    // Poll for live kitchen queue updates
     setInterval(() => {
         fetchOrders();
         fetchStats();
@@ -259,6 +268,10 @@ document.addEventListener('DOMContentLoaded', () => {
 // Setup Listeners
 function setupEventListeners() {
     searchInput.addEventListener('input', () => {
+        renderMenu();
+    });
+
+    vegOnlyToggle.addEventListener('change', () => {
         renderMenu();
     });
 
@@ -281,7 +294,7 @@ function setupEventListeners() {
     });
 }
 
-// Play Synthesized Audio via Web Audio API (Zero file dependencies)
+// Play Audio Feedback
 function playSynthesizedSound(type) {
     try {
         const AudioContext = window.AudioContext || window.webkitAudioContext;
@@ -313,7 +326,7 @@ function playSynthesizedSound(type) {
             osc.type = 'triangle';
             gain.gain.setValueAtTime(0.12, now);
             gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
-            osc.frequency.setValueAtTime(880.0, now); // A5
+            osc.frequency.setValueAtTime(880.0, now); 
             
             const oscH = ctx.createOscillator();
             const gainH = ctx.createGain();
@@ -322,7 +335,7 @@ function playSynthesizedSound(type) {
             oscH.type = 'sine';
             gainH.gain.setValueAtTime(0.04, now);
             gainH.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
-            oscH.frequency.setValueAtTime(1320.0, now); // E6
+            oscH.frequency.setValueAtTime(1320.0, now); 
             
             osc.start(now);
             osc.stop(now + 1.2);
@@ -330,23 +343,21 @@ function playSynthesizedSound(type) {
             oscH.stop(now + 0.8);
         }
     } catch (e) {
-        console.warn("Web Audio API blocked by browser permissions:", e);
+        console.warn("Web Audio API blocked:", e);
     }
 }
 
-// 1. Fetch Master Restaurant Profile (with Local Simulator Fallback)
+// 1. Fetch Restaurants
 async function fetchRestaurants() {
     try {
         const response = await fetch('/api/restaurants');
         if (!response.ok) throw new Error("HTTP error " + response.status);
         restaurants = await response.json();
         isSimulatorMode = false;
-        document.querySelector('.status-text').textContent = "Pullamma Central Engine Online";
+        document.querySelector('.status-text').textContent = "Pullamma Swiggy Engine Online";
     } catch (error) {
-        // Fall back to Local Browser Simulation Mode
-        console.warn("Java Backend not detected. Switching to Local Browser Simulator Mode...");
         isSimulatorMode = true;
-        document.querySelector('.status-text').textContent = "Local Browser Simulator Active";
+        document.querySelector('.status-text').textContent = "Static Browser Simulator Mode";
         
         restaurants = [{
             name: "Hotel Pullamma",
@@ -355,7 +366,6 @@ async function fetchRestaurants() {
             menu: FALLBACK_150_ITEMS
         }];
         
-        // Load simulated orders from localStorage if any
         const saved = localStorage.getItem('pullamma_orders');
         if (saved) {
             orders = JSON.parse(saved);
@@ -371,10 +381,11 @@ async function fetchRestaurants() {
         document.querySelector('.hotel-location').textContent = `📍 ${selectedRestaurant.address}`;
         
         renderMenu();
+        renderCart();
     }
 }
 
-// Update the crowd label dynamically based on active orders
+// Live kitchen queue status check
 function updateCrowdStatus() {
     const activeQueueCount = orders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled').length;
     const crowdLabel = document.getElementById('hotel-crowd-label');
@@ -405,14 +416,19 @@ function updateCrowdStatus() {
     }
 }
 
-// 2. Render Menu Items with category filter & search text matching
+// 2. Render Menu Items with category filter, search, and Veg-Only switches
 function renderMenu() {
     if (!selectedRestaurant) return;
 
     const items = selectedRestaurant.menu;
     const searchText = searchInput.value.toLowerCase().trim();
+    const isVegOnly = vegOnlyToggle.checked;
     
     const filteredItems = items.filter(item => {
+        if (isVegOnly && item.type !== 'Veg') {
+            return false;
+        }
+
         if (searchText && !item.name.toLowerCase().includes(searchText) && !item.category.toLowerCase().includes(searchText)) {
             return false;
         }
@@ -452,6 +468,20 @@ function renderMenu() {
             rating = (4.4 + (hash % 6) * 0.1).toFixed(1) + " ★"; 
         }
 
+        // Check if item is in the cart to render ADD button or Quantity Pill
+        const inCartQty = cart[item.name] ? cart[item.name].quantity : 0;
+        let actionMarkup = '';
+        if (inCartQty > 0) {
+            actionMarkup = `
+                <div class="qty-pill-swiggy">
+                    <button class="qty-btn-swiggy dec-btn" data-name="${item.name}">-</button>
+                    <span class="qty-val-swiggy">${inCartQty}</span>
+                    <button class="qty-btn-swiggy inc-btn" data-name="${item.name}">+</button>
+                </div>`;
+        } else {
+            actionMarkup = `<button class="add-cart-btn-swiggy add-btn" data-name="${item.name}">ADD</button>`;
+        }
+
         card.innerHTML = `
             <div class="item-left">
                 <div class="item-badge-row">
@@ -464,33 +494,58 @@ function renderMenu() {
                 <span class="item-price">₹${item.price.toFixed(2)}</span>
             </div>
             <div class="item-right">
-                <button class="add-cart-btn">Add to Cart</button>
+                ${actionMarkup}
             </div>
         `;
 
-        card.querySelector('.add-cart-btn').addEventListener('click', () => {
-            addToCart(item);
-        });
+        // Bind Actions
+        const addBtn = card.querySelector('.add-btn');
+        if (addBtn) {
+            addBtn.addEventListener('click', () => addToCart(item));
+        }
+
+        const incBtn = card.querySelector('.inc-btn');
+        if (incBtn) {
+            incBtn.addEventListener('click', () => addToCart(item));
+        }
+
+        const decBtn = card.querySelector('.dec-btn');
+        if (decBtn) {
+            decBtn.addEventListener('click', () => removeFromCart(item.name));
+        }
 
         menuItemsContainer.appendChild(card);
     });
 }
 
-// 3. Cart Management
+// 3. Cart Management with quantities support
 function addToCart(item) {
-    cart.push(item);
+    if (cart[item.name]) {
+        cart[item.name].quantity += 1;
+    } else {
+        cart[item.name] = { item: item, quantity: 1 };
+    }
     renderCart();
+    renderMenu();
     validateCheckoutForm();
 }
 
-function removeFromCart(index) {
-    cart.splice(index, 1);
+function removeFromCart(itemName) {
+    if (cart[itemName]) {
+        cart[itemName].quantity -= 1;
+        if (cart[itemName].quantity <= 0) {
+            delete cart[itemName];
+        }
+    }
     renderCart();
+    renderMenu();
     validateCheckoutForm();
 }
 
 function renderCart() {
-    if (cart.length === 0) {
+    const cartKeys = Object.keys(cart);
+
+    if (cartKeys.length === 0) {
         cartItemsContainer.innerHTML = `
             <div class="empty-cart-message">
                 <span class="cart-icon">🛒</span>
@@ -498,36 +553,58 @@ function renderCart() {
             </div>`;
         billSubtotal.textContent = "₹0.00";
         billDiscountRow.classList.add('hidden');
+        
+        // Hide fees when cart is empty
+        document.getElementById('bill-delivery-row').classList.add('hidden');
+        document.getElementById('bill-packaging-row').classList.add('hidden');
+        document.getElementById('bill-tax-row').classList.add('hidden');
+        
         billTotal.textContent = "₹0.00";
         return;
     }
 
     cartItemsContainer.innerHTML = '';
-    let subtotal = 0.0;
+    let itemSubtotal = 0.0;
 
-    cart.forEach((item, index) => {
-        subtotal += item.price;
+    cartKeys.forEach((key) => {
+        const cartLine = cart[key];
+        const linePrice = cartLine.item.price * cartLine.quantity;
+        itemSubtotal += linePrice;
+
         const div = document.createElement('div');
-        div.className = 'cart-item';
+        div.className = 'cart-item-swiggy';
         div.innerHTML = `
-            <span class="cart-item-name">${item.type === 'Veg' ? '🟢' : '🔴'} ${item.name}</span>
-            <div class="cart-item-meta">
-                <span class="cart-item-price">₹${item.price.toFixed(2)}</span>
-                <button class="remove-cart-btn" title="Remove Item">&times;</button>
+            <div class="cart-item-info-swiggy">
+                <span class="cart-item-name-swiggy">${cartLine.item.type === 'Veg' ? '🟢' : '🔴'} ${cartLine.item.name}</span>
+                <span class="cart-item-category-swiggy">${cartLine.item.category}</span>
+            </div>
+            <div class="cart-item-actions-swiggy">
+                <div class="cart-qty-pill">
+                    <button class="cart-qty-btn cart-dec" data-name="${cartLine.item.name}">-</button>
+                    <span class="cart-qty-val">${cartLine.quantity}</span>
+                    <button class="cart-qty-btn cart-inc" data-name="${cartLine.item.name}">+</button>
+                </div>
+                <span class="cart-item-price-swiggy">₹${linePrice.toFixed(2)}</span>
             </div>
         `;
 
-        div.querySelector('.remove-cart-btn').addEventListener('click', () => {
-            removeFromCart(index);
+        div.querySelector('.cart-inc').addEventListener('click', () => {
+            addToCart(cartLine.item);
+        });
+
+        div.querySelector('.cart-dec').addEventListener('click', () => {
+            removeFromCart(cartLine.item.name);
         });
 
         cartItemsContainer.appendChild(div);
     });
 
-    const discountAmount = subtotal * (appliedDiscount / 100.0);
-    const grandTotal = subtotal - discountAmount;
+    // Detailed Swiggy Billing equations
+    const discountAmount = itemSubtotal * (appliedDiscount / 100.0);
+    const gstAmount = itemSubtotal * 0.05; // 5% GST
+    const payableTotal = itemSubtotal - discountAmount + gstAmount + DELIVERY_FEE + PACKAGING_FEE;
 
-    billSubtotal.textContent = `₹${subtotal.toFixed(2)}`;
+    billSubtotal.textContent = `₹${itemSubtotal.toFixed(2)}`;
     
     if (appliedDiscount > 0) {
         discountPctLabel.textContent = appliedDiscount;
@@ -537,10 +614,18 @@ function renderCart() {
         billDiscountRow.classList.add('hidden');
     }
 
-    billTotal.textContent = `₹${grandTotal.toFixed(2)}`;
+    // Show fees
+    document.getElementById('bill-delivery-row').classList.remove('hidden');
+    document.getElementById('bill-packaging-row').classList.remove('hidden');
+    document.getElementById('bill-tax-row').classList.remove('hidden');
+
+    billDelivery.textContent = `₹${DELIVERY_FEE.toFixed(2)}`;
+    billPackaging.textContent = `₹${PACKAGING_FEE.toFixed(2)}`;
+    billTax.textContent = `₹${gstAmount.toFixed(2)}`;
+    billTotal.textContent = `₹${payableTotal.toFixed(2)}`;
 }
 
-// Promo Code validation
+// Apply Promo Code
 function applyPromoCode() {
     const code = promoCodeInput.value.trim().toUpperCase();
     if (!code) {
@@ -561,46 +646,60 @@ function applyPromoCode() {
         appliedDiscount = 0.0;
         promoCodeApplied = "";
         promoFeedback.className = "promo-feedback error";
-        promoFeedback.textContent = "❌ Invalid promo code. Try DOSA20 or PULLAMMA50.";
+        promoFeedback.textContent = "❌ Invalid code. Try PULLAMMA50.";
     }
     renderCart();
 }
 
 function validateCheckoutForm() {
     const name = customerNameInput.value.trim();
-    const hasItems = cart.length > 0;
+    const hasItems = Object.keys(cart).length > 0;
     
     placeOrderBtn.disabled = !(name && hasItems);
 }
 
-// 4. Place Order API Call / Local Simulator
+// 4. Place Order
 async function placeOrder() {
     const name = customerNameInput.value.trim();
-    if (!name || cart.length === 0) return;
+    const cartKeys = Object.keys(cart);
+    if (!name || cartKeys.length === 0) return;
 
     placeOrderBtn.disabled = true;
-    placeOrderBtn.textContent = "Sending to Kitchen...";
+    placeOrderBtn.textContent = "Sending to Swiggy...";
 
-    const payload = {
-        customerName: name,
-        items: cart.map(item => ({ name: item.name, price: item.price, type: item.type })),
-        discount: appliedDiscount
-    };
+    // Flatten cart items to array of names repeating based on quantity
+    const itemsFlatList = [];
+    cartKeys.forEach(key => {
+        const cartLine = cart[key];
+        for (let i = 0; i < cartLine.quantity; i++) {
+            itemsFlatList.push(cartLine.item.name);
+        }
+    });
 
     if (isSimulatorMode) {
-        // Run simulated order placement inside the browser
         setTimeout(() => {
             const newOrderNo = orders.length + 1;
             
-            // Calculate final price locally
-            let subtotal = 0;
-            cart.forEach(i => subtotal += i.price);
-            const finalPrice = Math.round((subtotal - (subtotal * (appliedDiscount / 100))) * 100) / 100;
+            // Re-calculate math locally
+            let itemSubtotal = 0;
+            cartKeys.forEach(k => {
+                itemSubtotal += cart[k].item.price * cart[k].quantity;
+            });
+            const discountAmount = itemSubtotal * (appliedDiscount / 100.0);
+            const gstAmount = itemSubtotal * 0.05;
+            const finalPrice = Math.round((itemSubtotal - discountAmount + gstAmount + DELIVERY_FEE + PACKAGING_FEE) * 100.0) / 100.0;
+
+            const flatItemsRepresentation = [];
+            cartKeys.forEach(k => {
+                for (let i = 0; i < cart[k].quantity; i++) {
+                    flatItemsRepresentation.push(cart[k].item);
+                }
+            });
 
             const newOrder = {
                 orderNo: newOrderNo,
                 customerName: name,
-                items: cart,
+                items: flatItemsRepresentation,
                 discountApplied: appliedDiscount,
                 finalPrice: finalPrice,
                 status: "Pending"
@@ -611,23 +710,19 @@ async function placeOrder() {
 
             playSynthesizedSound('order-placed');
             clearCartForm();
-
-            // Simulate kitchen cooking steps automatically
             simulateKitchenCooking(newOrderNo);
-
             renderOrders();
             updateCrowdStatus();
             fetchStats();
         }, 800);
     } else {
-        // Send order to Java server
         try {
             const response = await fetch('/api/orders', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     customerName: name,
-                    items: cart.map(item => item.name),
+                    items: itemsFlatList,
                     discount: appliedDiscount
                 })
             });
@@ -640,18 +735,19 @@ async function placeOrder() {
             fetchStats();
         } catch (error) {
             console.error("Order error:", error);
-            alert("Connection lost. Retrying via Local Simulator...");
+            alert("Connection lost. Switched to Static Simulator.");
         }
     }
 }
 
 function clearCartForm() {
-    cart = [];
+    cart = {};
     promoCodeInput.value = "";
     appliedDiscount = 0.0;
     promoCodeApplied = "";
     promoFeedback.textContent = "";
     renderCart();
+    renderMenu();
     validateCheckoutForm();
     placeOrderBtn.textContent = "⚡ Send Order to Pullamma Kitchen";
     document.querySelector('.order-tracking-section').scrollIntoView({ behavior: 'smooth' });
@@ -670,7 +766,7 @@ function simulateKitchenCooking(orderNo) {
         }
     }, 3000);
 
-    // 2. Advance to Ready in 7 seconds and play temple bell chime
+    // 2. Advance to Ready in 8 seconds and play temple bell chime
     setTimeout(() => {
         const order = orders.find(o => o.orderNo === orderNo);
         if (order && order.status === 'Preparing') {
@@ -683,10 +779,9 @@ function simulateKitchenCooking(orderNo) {
     }, 8000);
 }
 
-// 5. Fetch & Render Orders (Live Tracking / Local Simulator support)
+// 5. Fetch & Render Orders (Live Status Timeline)
 async function fetchOrders() {
     if (isSimulatorMode) {
-        // Sim Mode: values are already loaded in memory
         renderOrders();
         updateCrowdStatus();
     } else {
@@ -719,7 +814,7 @@ function renderOrders() {
         ordersTimelineContainer.innerHTML = `
             <div class="empty-orders-message">
                 <span class="clock-icon">🕒</span>
-                <p>No active orders. Place an order to track.</p>
+                <p>No active orders in the kitchen. Order now to track.</p>
             </div>`;
         return;
     }
@@ -756,7 +851,17 @@ function renderOrders() {
             fillWidth = '100%';
         }
 
-        const itemsString = order.items.map(i => `${i.type === 'Veg' ? '🟢' : '🔴'} ${i.name}`).join(', ');
+        // Group same item names with quantities for professional Swiggy list formatting
+        const itemCounts = {};
+        order.items.forEach(item => {
+            itemCounts[item.name] = (itemCounts[item.name] || 0) + 1;
+        });
+
+        const itemsString = Object.entries(itemCounts).map(([name, qty]) => {
+            const matched = order.items.find(i => i.name === name);
+            const dot = matched && matched.type === 'Veg' ? '🟢' : '🔴';
+            return `${dot} ${name} x ${qty}`;
+        }).join(', ');
 
         card.innerHTML = `
             <div class="order-card-top">
@@ -849,7 +954,6 @@ async function advanceOrderStatus(orderNo) {
 // 6. Fetch Dashboard Statistics
 async function fetchStats() {
     if (isSimulatorMode) {
-        // Calculate stats locally
         let totalRevenue = 0.0;
         const itemSales = {};
         

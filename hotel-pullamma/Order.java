@@ -26,12 +26,22 @@ public class Order {
     }
 
     private double calculateFinalPrice() {
-        double total = 0.0;
+        double itemTotal = 0.0;
         for (Menuitems item : menuitems) {
-            // Apply discount to each item using the Discounts interface method on Menuitems
-            total += item.applydiscount(discountApplied);
+            itemTotal += item.getprice();
         }
-        return Math.round(total * 100.0) / 100.0; // Round to 2 decimal places
+        
+        if (itemTotal == 0.0) {
+            return 0.0;
+        }
+
+        double discount = (discountApplied / 100.0) * itemTotal;
+        double gst = 0.05 * itemTotal;
+        double deliveryFee = 29.0;
+        double packagingFee = 15.0;
+        
+        double grandTotal = itemTotal - discount + gst + deliveryFee + packagingFee;
+        return Math.round(grandTotal * 100.0) / 100.0; // Round to 2 decimal places
     }
 
     public int getorderNo() {

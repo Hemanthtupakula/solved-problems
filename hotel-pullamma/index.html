@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hotel Pullamma | Traditional Andhra Food Portal</title>
+    <title>Hotel Pullamma | Traditional Swiggy Food Portal</title>
     <!-- Outfit & Inter Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -25,7 +25,7 @@
                 </div>
                 <div>
                     <h1>Hotel Pullamma</h1>
-                    <p class="subtitle">150 Traditional Andhra Pradesh Dishes & Live Tracker</p>
+                    <p class="subtitle">150 Traditional Andhra Pradesh Dishes & Swiggy Simulator</p>
                 </div>
             </div>
             <div class="system-status">
@@ -88,8 +88,15 @@
                 </div>
 
                 <div class="panel-header search-header">
-                    <div class="search-row">
+                    <div class="search-row flex-row">
                         <input type="text" id="search-input" placeholder="🔍 Search among 150 traditional dishes...">
+                        <div class="veg-toggle-container">
+                            <span class="veg-toggle-label">🟢 Veg Only</span>
+                            <label class="switch">
+                                <input type="checkbox" id="veg-only-toggle">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
                     </div>
                     <div class="menu-filters-wrapper">
                         <div class="menu-filters">
@@ -119,8 +126,8 @@
                 <!-- Cart & Checkout -->
                 <section class="panel-section" id="cart-panel">
                     <div class="panel-header">
-                        <h2>🛒 Selected Order Details</h2>
-                        <p>Review items & apply promotions</p>
+                        <h2>🛒 Swiggy Cart Summary</h2>
+                        <p>Adjust item counts & select options</p>
                     </div>
                     <div class="cart-container">
                         <div class="cart-items" id="cart-items-container">
@@ -133,13 +140,32 @@
                         <div class="cart-checkout-form">
                             <div class="input-group">
                                 <label for="customer-name">Customer Name</label>
-                                <input type="text" id="customer-name" placeholder="Enter name for pickup" required>
+                                <input type="text" id="customer-name" placeholder="Enter name for delivery" required>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="delivery-address">Delivery Address</label>
+                                <select id="delivery-address">
+                                    <option value="Home">🏠 Home - Secunderabad, Andhra Pradesh</option>
+                                    <option value="Office">🏢 Office - Hitech City, Hyderabad</option>
+                                    <option value="Other">📍 Other - Near Temple Road, Vijayawada</option>
+                                </select>
+                            </div>
+
+                            <div class="input-group">
+                                <label for="payment-method">Payment Mode</label>
+                                <select id="payment-method">
+                                    <option value="UPI">📱 UPI (Google Pay / PhonePe / Paytm)</option>
+                                    <option value="Card">💳 Credit / Debit Card</option>
+                                    <option value="NetBanking">🌐 Net Banking</option>
+                                    <option value="COD">💵 Cash on Delivery</option>
+                                </select>
                             </div>
                             
                             <div class="input-group">
                                 <label for="promo-code">Promo Code / Coupon</label>
                                 <div class="promo-row">
-                                    <input type="text" id="promo-code" placeholder="e.g., DOSA20, PULLAMMA50">
+                                    <input type="text" id="promo-code" placeholder="Try PULLAMMA50, DOSA20">
                                     <button type="button" id="apply-promo-btn">Apply</button>
                                 </div>
                                 <span class="promo-feedback" id="promo-feedback"></span>
@@ -149,15 +175,28 @@
                             
                             <div class="bill-details">
                                 <div class="bill-row">
-                                    <span>Subtotal</span>
+                                    <span>Item Total</span>
                                     <span id="bill-subtotal">₹0.00</span>
                                 </div>
                                 <div class="bill-row discount-row hidden" id="bill-discount-row">
-                                    <span>Discount (<span id="discount-pct">0</span>%)</span>
+                                    <span>Promo Discount (<span id="discount-pct">0</span>%)</span>
                                     <span id="bill-discount">-₹0.00</span>
                                 </div>
+                                <div class="bill-row charge-row" id="bill-delivery-row">
+                                    <span>Delivery Partner Fee</span>
+                                    <span id="bill-delivery">₹29.00</span>
+                                </div>
+                                <div class="bill-row charge-row" id="bill-packaging-row">
+                                    <span>Restaurant Packaging Charges</span>
+                                    <span id="bill-packaging">₹15.00</span>
+                                </div>
+                                <div class="bill-row charge-row" id="bill-tax-row">
+                                    <span>Taxes & Charges (5% GST)</span>
+                                    <span id="bill-tax">₹0.00</span>
+                                </div>
+                                <hr class="divider bill-divider">
                                 <div class="bill-row total-row">
-                                    <span>Grand Total</span>
+                                    <span>Grand Total (To Pay)</span>
                                     <span id="bill-total">₹0.00</span>
                                 </div>
                             </div>
@@ -173,7 +212,7 @@
                 <section class="panel-section order-tracking-section">
                     <div class="panel-header order-tracker-header">
                         <div>
-                            <h2>⏱️ Live Kitchen Pipeline</h2>
+                            <h2>⏱️ Swiggy Delivery Status</h2>
                             <p>Track your food. Temple-bell ring alerts when food is ready!</p>
                         </div>
                         <button class="btn-secondary" id="refresh-orders-btn">🔄 Refresh</button>
