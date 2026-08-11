@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SYSTEM BREACH</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --bg:#050705;
+    --green:#39ff6a;
+    --green-dim:#0f5c26;
+    --amber:#ffb000;
+    --red:#ff3b3b;
+    --mono: 'Courier New', 'Consolas', monospace;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{
+    height:100%;
+    background:var(--bg);
+    overflow:hidden;
+    font-family:var(--mono);
+  }
+  #matrix{
+    position:fixed; inset:0; z-index:0;
+  }
+  .scanlines{
+    position:fixed; inset:0; z-index:5; pointer-events:none;
+    background:repeating-linear-gradient(
+      to bottom,
+      rgba(0,0,0,0) 0px,
+      rgba(0,0,0,0) 2px,
+      rgba(0,0,0,0.18) 3px,
+      rgba(0,0,0,0) 4px
+    );
+    mix-blend-mode:overlay;
+  }
+  .vignette{
+    position:fixed; inset:0; z-index:6; pointer-events:none;
+    box-shadow: inset 0 0 180px 60px rgba(0,0,0,0.85);
+  }
+  #console{
+    position:relative; z-index:10;
+    height:100%;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    padding:24px;
+    text-align:center;
+  }
+  .terminal{
+    width:100%; max-width:640px;
+    border:1px solid var(--green-dim);
+    background:rgba(2,8,4,0.72);
+    box-shadow:0 0 40px rgba(57,255,106,0.15), inset 0 0 60px rgba(0,0,0,0.6);
+    padding:22px 20px;
+    color:var(--green);
+    text-shadow:0 0 6px rgba(57,255,106,0.65);
+  }
+  .titlebar{
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:11px; letter-spacing:2px; color:var(--green-dim);
+    border-bottom:1px dashed var(--green-dim);
+    padding-bottom:8px; margin-bottom:14px;
+  }
+  .dots span{
+    display:inline-block; width:8px; height:8px; border-radius:50%;
+    margin-right:5px; background:var(--green-dim);
+  }
+  #stage1, #stage2, #stage3{ }
+  #stage2, #stage3{ display:none; }
+
+  .glitch{
+    font-size:clamp(28px, 7vw, 46px);
+    font-weight:bold;
+    letter-spacing:3px;
+    animation:glitch 0.6s infinite;
+  }
+  @keyframes glitch{
+    0%{ transform:translate(0,0); }
+    20%{ transform:translate(-2px,1px); text-shadow:2px 0 var(--red), -2px 0 var(--amber); }
+    40%{ transform:translate(2px,-1px); }
+    60%{ transform:translate(-1px,2px); text-shadow:-2px 0 var(--red), 2px 0 var(--amber); }
+    80%{ transform:translate(1px,-2px); }
+    100%{ transform:translate(0,0); }
+  }
+
+  .line{
+    font-size:14px;
+    text-align:left;
+    line-height:1.7;
+    white-space:pre-wrap;
+    min-height:1.7em;
+  }
+  .log{ text-align:left; margin-top:10px; font-size:13px; line-height:1.75; }
+  .caret{
+    display:inline-block; width:8px; background:var(--green);
+    animation:blink 0.9s steps(1) infinite;
+  }
+  @keyframes blink{ 50%{ opacity:0; } }
+
+  .barwrap{
+    margin-top:16px; text-align:left; font-size:12px;
+  }
+  .bar{
+    width:100%; height:14px; border:1px solid var(--green-dim);
+    margin-top:4px; position:relative; overflow:hidden;
+  }
+  .bar > div{
+    height:100%; width:0%;
+    background:repeating-linear-gradient(45deg, var(--green), var(--green) 6px, var(--green-dim) 6px, var(--green-dim) 12px);
+  }
+
+  .skull{
+    font-size:12px; line-height:1.15; color:var(--red);
+    text-shadow:0 0 8px rgba(255,59,59,0.7);
+    margin:14px auto;
+    white-space:pre;
+  }
+
+  .reveal{
+    color:#eafff0;
+    text-shadow:none;
+  }
+  .reveal h1{
+    font-size:clamp(26px, 6vw, 40px);
+    color:var(--green);
+    text-shadow:0 0 10px rgba(57,255,106,0.6);
+    margin-bottom:10px;
+  }
+  .reveal p{
+    font-size:14px; line-height:1.7; margin-top:10px; color:#c8ffd8;
+  }
+  .reveal .tag{
+    display:inline-block; margin-top:18px; font-size:11px;
+    letter-spacing:2px; color:var(--green-dim);
+    border:1px solid var(--green-dim); padding:6px 10px;
+  }
+  .btn{
+    margin-top:20px;
+    background:transparent; color:var(--green);
+    border:1px solid var(--green); padding:10px 18px;
+    font-family:var(--mono); font-size:13px; letter-spacing:1px;
+    cursor:pointer;
+  }
+  .btn:hover{ background:var(--green); color:#03150a; }
+
+  .shake{ animation:shake 0.35s; }
+  @keyframes shake{
+    10%,90%{ transform:translate(-1px,0); }
+    20%,80%{ transform:translate(2px,-1px); }
+    30%,50%,70%{ transform:translate(-3px,2px); }
+    40%,60%{ transform:translate(3px,-2px); }
+  }
+
+  .flash{
+    position:fixed; inset:0; background:#fff; opacity:0;
+    z-index:20; pointer-events:none;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+<div class="scanlines"></div>
+<div class="vignette"></div>
+<div class="flash" id="flash"></div>
+
+<div id="console">
+  <div class="terminal" id="terminal">
+
+    <div class="titlebar">
+      <span><span class="dots"><span></span><span></span><span></span></span>root@unknown</span>
+      <span id="clock">00:00:00</span>
+    </div>
+
+    <div id="stage1">
+      <div class="glitch">SYSTEM BREACH</div>
+      <div class="log" id="log"></div>
+      <div class="barwrap">
+        <div>INTRUSION PROGRESS</div>
+        <div class="bar"><div id="progress"></div></div>
+      </div>
+      <div class="skull" id="skull"></div>
+    </div>
+
+    <div id="stage2">
+      <div class="line" id="typewriter"></div>
+    </div>
+
+    <div id="stage3" class="reveal">
+      <h1>😄 GOTCHA!</h1>
+      <p>Relax — nothing happened to your phone, your WhatsApp, or your data.<br>
+      This is just a webpage doing a spooky little show for laughs.</p>
+      <p>No files were touched. No accounts were harmed. You've simply been pranked by a friend with too much free time.</p>
+      <div class="tag">100% HARMLESS · JUST A JOKE</div><br>
+      <button class="btn" onclick="restart()">RUN IT AGAIN</button>
+    </div>
+
+  </div>
+
+  <div id="tapstart" style="position:relative; z-index:15; margin-top:18px; color:#0f5c26; font-family:Courier New, monospace; font-size:12px; letter-spacing:1px;">
+    tap anywhere to enable sound
+  </div>
+</div>
+
+<script>
+// ---------- matrix rain background ----------
+const canvas = document.getElementById('matrix');
+const ctx = canvas.getContext('2d');
+function resize(){ canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+
+const chars = "アイウエオカキクケコサシスセソタチツテト0123456789ABCDEF";
+const fontSize = 15;
+let columns, drops;
+function setupColumns(){
+  columns = Math.floor(canvas.width / fontSize);
+  drops = new Array(columns).fill(1);
+}
+setupColumns();
+window.addEventListener('resize', setupColumns);
+
+function drawMatrix(){
+  ctx.fillStyle = "rgba(3,10,5,0.15)";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle = "#39ff6a";
+  ctx.font = fontSize + "px monospace";
+  for(let i=0;i<drops.length;i++){
+    const text = chars[Math.floor(Math.random()*chars.length)];
+    ctx.fillText(text, i*fontSize, drops[i]*fontSize);
+    if(drops[i]*fontSize > canvas.height && Math.random() > 0.975){
+      drops[i] = 0;
+    }
+    drops[i]++;
+  }
+}
+setInterval(drawMatrix, 45);
+
+// ---------- clock ----------
+function tickClock(){
+  document.getElementById('clock').textContent = new Date().toLocaleTimeString();
+}
+setInterval(tickClock, 1000);
+tickClock();
+
+// ---------- fake log lines ----------
+const logLines = [
+  "[*] locating target device ...",
+  "[*] bypassing encryption layer ...",
+  "[!] firewall resistance detected",
+  "[*] rerouting through proxy chain ...",
+  "[*] extracting message cache ...",
+  "[✓] access level: ROOT"
+];
+
+const skullArt =
+`   .-.
+  (o.o)
+   |=|
+  __|__
+//.=|=.\\\\
+\\\\/=|=\\\\/`;
+
+const flash = document.getElementById('flash');
+function doFlash(){
+  flash.style.transition = "none";
+  flash.style.opacity = "0.5";
+  requestAnimationFrame(()=>{
+    flash.style.transition = "opacity 0.4s";
+    flash.style.opacity = "0";
+  });
+}
+
+async function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+// ---------- intense heavy sound using Web Audio API (Fully Sandboxed) ----------
+let audioCtx = null;
+let synthNodes = [];
+
+function startAlarm(){
+  if(!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if(audioCtx.state === "suspended") {
+    audioCtx.resume();
+  }
+
+  const destination = audioCtx.destination;
+
+  // 1. Create a Waveshaper node for severe distortion / grit
+  const distortion = audioCtx.createWaveShaper();
+  function makeDistortionCurve(amount) {
+    const k = typeof amount === 'number' ? amount : 50;
+    const n_samples = 44100;
+    const curve = new Float32Array(n_samples);
+    const deg = Math.PI / 180;
+    for (let i = 0; i < n_samples; ++i) {
+      const x = (i * 2) / n_samples - 1;
+      curve[i] = ((3 + k) * x * 20 * deg) / (Math.PI + k * Math.abs(x));
+    }
+    return curve;
+  }
+  distortion.curve = makeDistortionCurve(120);
+  distortion.oversample = '4x';
+
+  // 2. Master Gain (safely capped to highest browser output level)
+  const masterGain = audioCtx.createGain();
+  masterGain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+
+  distortion.connect(masterGain);
+  masterGain.connect(destination);
+
+  // 3. Sub-bass heavy rumble (Sawtooth oscillator at 55Hz)
+  const subOsc = audioCtx.createOscillator();
+  subOsc.type = 'sawtooth';
+  subOsc.frequency.setValueAtTime(55, audioCtx.currentTime);
+
+  const subGain = audioCtx.createGain();
+  subGain.gain.setValueAtTime(0.9, audioCtx.currentTime);
+
+  subOsc.connect(subGain);
+  subGain.connect(distortion);
+
+  // 4. Aggressive screaming siren (Sawtooth oscillator at 480Hz)
+  const sirenOsc = audioCtx.createOscillator();
+  sirenOsc.type = 'sawtooth';
+  sirenOsc.frequency.setValueAtTime(480, audioCtx.currentTime);
+
+  const sirenGain = audioCtx.createGain();
+  sirenGain.gain.setValueAtTime(0.5, audioCtx.currentTime);
+
+  sirenOsc.connect(sirenGain);
+  sirenGain.connect(distortion);
+
+  // 5. Low Frequency Oscillator (LFO) for rapid pitch modulation
+  const lfo = audioCtx.createOscillator();
+  lfo.type = 'sine';
+  lfo.frequency.setValueAtTime(4.0, audioCtx.currentTime); // 4Hz sweeping speed
+
+  const lfoSirenGain = audioCtx.createGain();
+  lfoSirenGain.gain.setValueAtTime(180, audioCtx.currentTime); // heavy siren sweep depth
+
+  lfo.connect(lfoSirenGain);
+  lfoSirenGain.connect(sirenOsc.frequency);
+
+  const lfoSubGain = audioCtx.createGain();
+  lfoSubGain.gain.setValueAtTime(20, audioCtx.currentTime); // subtle sub-pitch sweep
+
+  lfo.connect(lfoSubGain);
+  lfoSubGain.connect(subOsc.frequency);
+
+  // Start all nodes
+  subOsc.start();
+  sirenOsc.start();
+  lfo.start();
+
+  synthNodes = [subOsc, sirenOsc, lfo, subGain, sirenGain, lfoSirenGain, lfoSubGain, distortion, masterGain];
+}
+
+function stopAlarm(){
+  if(synthNodes.length > 0){
+    const now = audioCtx.currentTime;
+    const masterGainNode = synthNodes[synthNodes.length - 1];
+    try {
+      masterGainNode.gain.cancelScheduledValues(now);
+      masterGainNode.gain.linearRampToValueAtTime(0.0001, now + 0.25);
+    } catch(e) {}
+    
+    setTimeout(() => {
+      synthNodes.forEach(node => {
+        try {
+          if(node.stop) node.stop();
+        } catch(e) {}
+      });
+      synthNodes = [];
+    }, 300);
+  }
+}
+
+async function runLog(){
+  const logEl = document.getElementById('log');
+  const progress = document.getElementById('progress');
+  const terminal = document.getElementById('terminal');
+  let pct = 0;
+
+  startAlarm();
+
+  for(let i=0;i<logLines.length;i++){
+    await sleep(550 + Math.random()*400);
+    logEl.textContent += logLines[i] + "\n";
+    pct = Math.min(100, Math.round(((i+1)/logLines.length)*100));
+    progress.style.width = pct + "%";
+    terminal.classList.add('shake');
+    doFlash();
+    setTimeout(()=>terminal.classList.remove('shake'), 350);
+  }
+
+  await sleep(400);
+  document.getElementById('skull').textContent = skullArt;
+  await sleep(1400);
+
+  // move to stage 2
+  document.getElementById('stage1').style.display = 'none';
+  const s2 = document.getElementById('stage2');
+  s2.style.display = 'block';
+  await typewrite("connection terminated by remote host.\njust kidding. loading punchline ...", "typewriter");
+  await sleep(1100);
+
+  s2.style.display = 'none';
+  document.getElementById('stage3').style.display = 'block';
+  stopAlarm();
+}
+
+async function typewrite(text, elId){
+  const el = document.getElementById(elId);
+  el.textContent = "";
+  for(const ch of text){
+    el.textContent += ch;
+    await sleep(28);
+  }
+}
+
+function restart(){
+  document.getElementById('stage3').style.display = 'none';
+  document.getElementById('stage2').style.display = 'none';
+  document.getElementById('stage1').style.display = 'block';
+  document.getElementById('log').textContent = "";
+  document.getElementById('skull').textContent = "";
+  document.getElementById('progress').style.width = "0%";
+  runLog();
+}
+
+// Mobile browsers require user interaction to allow playing audio.
+// The sequence starts on the first tap/click.
+const tapStart = document.getElementById('tapstart');
+let started = false;
+document.body.addEventListener('click', () => {
+  if(started) return;
+  started = true;
+  tapStart.style.display = 'none';
+  runLog();
+});
+</script>
+
+</body>
+</html>
