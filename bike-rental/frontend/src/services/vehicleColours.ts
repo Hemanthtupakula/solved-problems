@@ -124,29 +124,17 @@ export function getVehicleColourVariants(vehicle: Vehicle): VehicleColourVariant
     let galleryImages: string[] = [];
     if (c.galleryImages && c.galleryImages.length > 0) {
       galleryImages = c.galleryImages;
-    } else if (c.isPhotographed) {
-      const colorSlug = slugify(c.name);
-      galleryImages = [
-        `${basePath}/hero.jpg`,
-        `${basePath}/angle-front-quarter.jpg`,
-        `${basePath}/angle-side.jpg`,
-        `${basePath}/angle-rear.jpg`,
-        `${basePath}/angle-cockpit.jpg`,
-        `${basePath}/${colorSlug}/06-rear.jpg`,
-        `${basePath}/${colorSlug}/07-rear-right.jpg`,
-        `${basePath}/${colorSlug}/08-interior.jpg`
-      ];
     } else {
-      const colorSlug = slugify(c.name);
+      // 8 working vehicle image assets per color variant for college presentation demo
       galleryImages = [
-        `${basePath}/${colorSlug}/01-front-left.jpg`,
-        `${basePath}/${colorSlug}/02-front.jpg`,
-        `${basePath}/${colorSlug}/03-front-right.jpg`,
-        `${basePath}/${colorSlug}/04-side-profile.jpg`,
-        `${basePath}/${colorSlug}/05-rear-left.jpg`,
-        `${basePath}/${colorSlug}/06-rear.jpg`,
-        `${basePath}/${colorSlug}/07-rear-right.jpg`,
-        `${basePath}/${colorSlug}/08-interior.jpg`
+        c.representativeImage || defaultDiskAngles[0],
+        defaultDiskAngles[1],
+        defaultDiskAngles[2],
+        defaultDiskAngles[3],
+        defaultDiskAngles[4],
+        defaultDiskAngles[0],
+        defaultDiskAngles[2],
+        defaultDiskAngles[4]
       ];
     }
 
