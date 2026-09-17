@@ -8,6 +8,7 @@ import {
   Eye, 
   Clock
 } from 'lucide-react';
+import { buildImageKitUrl } from '../services/imageKit';
 
 interface Photographic360ViewerProps {
   frames?: string[];
@@ -37,7 +38,7 @@ export const Photographic360Viewer: React.FC<Photographic360ViewerProps> = ({
     let count = 0;
     frames.forEach((src) => {
       const img = new Image();
-      img.src = src;
+      img.src = buildImageKitUrl(src, { width: 800, quality: 80 });
       img.onload = () => {
         count++;
         setLoadedCount(count);
@@ -172,7 +173,7 @@ export const Photographic360Viewer: React.FC<Photographic360ViewerProps> = ({
     >
       {/* 360 Active Frame */}
       <img
-        src={frames[currentIndex]}
+        src={buildImageKitUrl(frames[currentIndex], { width: 800, quality: 80 })}
         alt={`${vehicleName} perspective ${currentIndex + 1}`}
         className="w-full h-full object-cover pointer-events-none"
         draggable={false}

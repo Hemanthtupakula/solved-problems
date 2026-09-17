@@ -64,13 +64,22 @@ export interface Vehicle {
   maskedRegistrationNumber?: string;
 }
 
+export interface ColorGalleryImage {
+  imageUrl: string;
+  label: string;
+  order?: number;
+}
+
 export interface VehicleColourVariant {
   name: string;
   hex: string;
   manufacturer: string;
   photoStatus: 'AVAILABLE' | 'PHOTO_PENDING';
   verified: boolean;
+  representativeImage?: string;
   galleryImages: string[];
+  spin360Images?: string[];
+  gallery?: ColorGalleryImage[];
   sourceInfo?: string;
 }
 

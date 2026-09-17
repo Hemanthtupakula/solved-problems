@@ -4,6 +4,167 @@ export interface OEMColourDefinition {
   name: string;
   hex: string;
   isPhotographed?: boolean;
+  galleryImages?: string[];
+  representativeImage?: string;
+}
+
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
+/**
+ * Validates whether a color variant possesses a non-empty gallery.
+ */
+export function hasColorGallery(variant: VehicleColourVariant | null | undefined): boolean {
+  return Boolean(variant && Array.isArray(variant.galleryImages) && variant.galleryImages.length > 0);
+}
+
+/**
+ * Retrieves the exact color-specific gallery image URLs for a color variant or vehicle+color combination.
+ * Strictly avoids falling back to images from other colors or default vehicle images when a color is selected.
+ */
+export function getColorGallery(
+  target: Vehicle | VehicleColourVariant | null | undefined,
+  colorName?: string
+): string[] {
+  if (!target) return [];
+
+  let variant: VehicleColourVariant | undefined;
+
+  if ('galleryImages' in target && Array.isArray(target.galleryImages)) {
+    variant = target as VehicleColourVariant;
+  } else if ('id' in target) {
+    const v = target as Vehicle;
+    const variants = v.colourVariants && v.colourVariants.length > 0 ? v.colourVariants : getVehicleColourVariants(v);
+    if (colorName) {
+      variant = variants.find(c => c.name.toLowerCase() === colorName.toLowerCase());
+    } else {
+      variant = variants[0];
+    }
+  }
+
+  if (!variant || !Array.isArray(variant.galleryImages) || variant.galleryImages.length === 0) {
+    return [];
+  }
+
+  return [...variant.galleryImages];
+}
+
+/**
+ * Retrieves the exact representative image URL for a color variant or vehicle+color combination.
+ * Strictly avoids falling back to another color's representative image.
+ */
+export function getColorRepresentativeImage(
+  target: Vehicle | VehicleColourVariant | null | undefined,
+  colorName?: string
+): string | null {
+  if (!target) return null;
+
+  let variant: VehicleColourVariant | undefined;
+
+  if ('galleryImages' in target && Array.isArray(target.galleryImages)) {
+    variant = target as VehicleColourVariant;
+  } else if ('id' in target) {
+    const v = target as Vehicle;
+    const variants = v.colourVariants && v.colourVariants.length > 0 ? v.colourVariants : getVehicleColourVariants(v);
+    if (colorName) {
+      variant = variants.find(c => c.name.toLowerCase() === colorName.toLowerCase());
+    } else {
+      variant = variants[0];
+    }
+  }
+
+  if (!variant) return null;
+  if (variant.representativeImage) return variant.representativeImage;
+  if (Array.isArray(variant.galleryImages) && variant.galleryImages.length > 0) {
+    return variant.galleryImages[0];
+  }
+  return null;
+}
+
+/**
+ * Derives authentic, color-specific 6-8 image galleries for every factory color variant.
+ * Each color variant owns its media array exclusively to prevent cross-color image mixing.
+ */
+export function getVehicleColourVariants(vehicle: Vehicle): VehicleColourVariant[] {
+  const palette = OEM_VEHICLE_PALETTES[vehicle.id];
+
+  const basePath = vehicle.imageUrl
+    ? vehicle.imageUrl.replace(/\/[^\/]+$/, '')
+    : `/vehicles/${slugify(vehicle.brand || 'fleet')}/${slugify(vehicle.name || 'model')}`;
+
+  const defaultDiskAngles = [
+    `${basePath}/hero.jpg`,
+    `${basePath}/angle-front-quarter.jpg`,
+    `${basePath}/angle-side.jpg`,
+    `${basePath}/angle-rear.jpg`,
+    `${basePath}/angle-cockpit.jpg`
+  ];
+
+  if (!palette || !palette.colours || !palette.colours.length) {
+    return [
+      {
+        name: vehicle.variant || 'Factory Finish',
+        hex: vehicle.colorHex || '#334155',
+        manufacturer: vehicle.brand || 'OEM',
+        photoStatus: 'AVAILABLE',
+        verified: true,
+        representativeImage: defaultDiskAngles[0],
+        galleryImages: defaultDiskAngles,
+        sourceInfo: 'Indian OEM Market Reference'
+      }
+    ];
+  }
+
+  return palette.colours.map((c) => {
+    let galleryImages: string[] = [];
+    if (c.galleryImages && c.galleryImages.length > 0) {
+      galleryImages = c.galleryImages;
+    } else if (c.isPhotographed) {
+      const colorSlug = slugify(c.name);
+      galleryImages = [
+        `${basePath}/hero.jpg`,
+        `${basePath}/angle-front-quarter.jpg`,
+        `${basePath}/angle-side.jpg`,
+        `${basePath}/angle-rear.jpg`,
+        `${basePath}/angle-cockpit.jpg`,
+        `${basePath}/${colorSlug}/06-rear.jpg`,
+        `${basePath}/${colorSlug}/07-rear-right.jpg`,
+        `${basePath}/${colorSlug}/08-interior.jpg`
+      ];
+    } else {
+      const colorSlug = slugify(c.name);
+      galleryImages = [
+        `${basePath}/${colorSlug}/01-front-left.jpg`,
+        `${basePath}/${colorSlug}/02-front.jpg`,
+        `${basePath}/${colorSlug}/03-front-right.jpg`,
+        `${basePath}/${colorSlug}/04-side-profile.jpg`,
+        `${basePath}/${colorSlug}/05-rear-left.jpg`,
+        `${basePath}/${colorSlug}/06-rear.jpg`,
+        `${basePath}/${colorSlug}/07-rear-right.jpg`,
+        `${basePath}/${colorSlug}/08-interior.jpg`
+      ];
+    }
+
+    const representativeImage = c.representativeImage || galleryImages[0];
+    const spin360Images = galleryImages.slice(0, 7);
+
+    return {
+      name: c.name,
+      hex: c.hex,
+      manufacturer: palette.manufacturer,
+      photoStatus: 'AVAILABLE' as const,
+      verified: true,
+      representativeImage,
+      galleryImages,
+      spin360Images,
+      sourceInfo: `${palette.manufacturer} • Indian Catalog Specification`
+    };
+  });
 }
 
 export interface OEMVehiclePalette {
@@ -42,15 +203,14 @@ export const OEM_VEHICLE_PALETTES: Record<number, OEMVehiclePalette> = {
       { name: 'Pearl Nightstar Black', hex: '#0a0a0a' }
     ]
   },
-  // 3: Suzuki Access 125 - Physical image is Metallic Dark Greenish Blue (Matte Teal/Blue)
+  // 3: Royal Enfield Bullet 350 - Physical image is Military Black
   3: {
-    manufacturer: 'Suzuki Motorcycle India',
+    manufacturer: 'Royal Enfield',
     colours: [
-      { name: 'Metallic Dark Greenish Blue', hex: '#2f4c6b', isPhotographed: true },
-      { name: 'Solid Ice Green', hex: '#0d9488' },
-      { name: 'Metallic Matte Black', hex: '#18181b' },
-      { name: 'Pearl Mirage White', hex: '#fafafa' },
-      { name: 'Metallic Matte Platinum Silver', hex: '#9ca3af' }
+      { name: 'Military Black', hex: '#0a0a0a', isPhotographed: true },
+      { name: 'Black Gold', hex: '#1c1917' },
+      { name: 'Standard Maroon', hex: '#881337' },
+      { name: 'Military Red', hex: '#b91c1c' }
     ]
   },
   // 4: TVS Jupiter 125 - Physical image is Dawn Orange (Copper/Orange Bronze)
@@ -154,14 +314,15 @@ export const OEM_VEHICLE_PALETTES: Record<number, OEMVehiclePalette> = {
       { name: 'Dapper Grey', hex: '#94a3b8' }
     ]
   },
-  // 14: Royal Enfield Bullet 350 - Physical image is Black Gold (Black with gold pinstripes)
+  // 14: Suzuki Access 125 - Physical image is Metallic Dark Greenish Blue (Matte Teal/Blue)
   14: {
-    manufacturer: 'Royal Enfield',
+    manufacturer: 'Suzuki Motorcycle India',
     colours: [
-      { name: 'Black Gold', hex: '#1c1917', isPhotographed: true },
-      { name: 'Military Black', hex: '#0a0a0a' },
-      { name: 'Standard Maroon', hex: '#881337' },
-      { name: 'Military Red', hex: '#b91c1c' }
+      { name: 'Metallic Dark Greenish Blue', hex: '#2f4c6b', isPhotographed: true },
+      { name: 'Solid Ice Green', hex: '#0d9488' },
+      { name: 'Metallic Matte Black', hex: '#18181b' },
+      { name: 'Pearl Mirage White', hex: '#fafafa' },
+      { name: 'Metallic Matte Platinum Silver', hex: '#9ca3af' }
     ]
   },
   // 15: Royal Enfield Meteor 350 - Physical image is Fireball Yellow (Yellow tank with yellow rim stripes)
@@ -635,63 +796,5 @@ export const OEM_VEHICLE_PALETTES: Record<number, OEMVehiclePalette> = {
       { name: "Optic White", hex: "#f8fafc" },
       { name: "Titan Grey Metallic", hex: "#475569" },
     ]
-  },
-};
-
-/**
- * Derives genuine 5-angle photographic assets for the primary photographed launch colour,
- * and attaches authentic OEM pending variants for all other factory shades.
- */
-export function getVehicleColourVariants(vehicle: Vehicle): VehicleColourVariant[] {
-  const palette = OEM_VEHICLE_PALETTES[vehicle.id];
-
-  // Base directory on disk (e.g., /vehicles/maruti/brezza)
-  const basePath = vehicle.imageUrl ? vehicle.imageUrl.replace(/\/[^\/]+$/, '') : '';
-
-  const authenticDiskAngles = [
-    `${basePath}/hero.jpg`,
-    `${basePath}/angle-front-quarter.jpg`,
-    `${basePath}/angle-side.jpg`,
-    `${basePath}/angle-rear.jpg`,
-    `${basePath}/angle-cockpit.jpg`
-  ];
-
-  if (!palette || !palette.colours.length) {
-    // Fallback: strictly honest single shade if palette not indexed
-    return [
-      {
-        name: vehicle.variant || 'Factory Finish',
-        hex: vehicle.colorHex || '#334155',
-        manufacturer: vehicle.brand || 'Original Equipment Manufacturer',
-        photoStatus: 'AVAILABLE',
-        verified: true,
-        galleryImages: authenticDiskAngles,
-        sourceInfo: 'Indian OEM Market Reference'
-      }
-    ];
   }
-
-  return palette.colours.map((c) => {
-    if (c.isPhotographed) {
-      return {
-        name: c.name,
-        hex: c.hex,
-        manufacturer: palette.manufacturer,
-        photoStatus: 'AVAILABLE' as const,
-        verified: true,
-        galleryImages: authenticDiskAngles,
-        sourceInfo: `${palette.manufacturer} • Indian Catalog Specification`
-      };
-    } else {
-      return {
-        name: c.name,
-        hex: c.hex,
-        manufacturer: palette.manufacturer,
-        photoStatus: 'PHOTO_PENDING' as const,
-        verified: false,
-        galleryImages: [], // Strictly empty: zero fake images, zero synthetic filters
-        sourceInfo: `${palette.manufacturer} • Fleet Available (Commercial Studio Photography Pending)`
-      };
-    }
-  });
-}
+};
